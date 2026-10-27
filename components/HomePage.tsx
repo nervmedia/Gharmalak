@@ -9,6 +9,8 @@ import { useLang } from './LangProvider';
 import { useStats } from './useStats';
 import { currentRound, inr, site, waLink } from '@/lib/config';
 
+const BACK_POSE = { rx: 9, ry: -16, gx: 70, gy: 30 };
+
 export function Home() {
   const { t } = useLang();
   const stats = useStats();
@@ -34,8 +36,8 @@ export function Home() {
                 <p className="hero-note"><BadgeCheck size={18} /> {t.hero_note}</p>
               </div>
               <div className="card-stage" aria-hidden="true">
-                <MalakCard className="back" name=" " number=" " label=" " over=" " />
-                <MalakCard name="Priya Deshmukh" number="GM · 0001 · NGP" label={t.card_member} over={t.card_over} />
+                <MalakCard className="back" finish="titanium" still pose={BACK_POSE} name="Rahul Joshi" number="GM · 0002 · NGP" label={t.card_member} over={t.card_over} />
+                <MalakCard className="front" name="Priya Deshmukh" number="GM · 0001 · NGP" label={t.card_member} over={t.card_over} />
                 <div className="gm-alert float">
                   <div className="gm-alert-badge"><MessageCircle size={18} /></div>
                   <div className="gm-alert-body">
@@ -53,7 +55,7 @@ export function Home() {
           </div>
         </section>
 
-        <section className="section" id="how">
+        <section className="section" id="how" data-theme="light">
           <div className="wrap">
             <div className="section-head">
               <p className="overline">{t.how_over}</p>

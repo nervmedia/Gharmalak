@@ -10,7 +10,7 @@ export function Footer() {
       <div className="wrap footer-row">
         <div className="brand">
           <Mark size={22} />
-          <span className="brand-name">Gharmalak</span>
+          <span className="brand-name">Gharmalak<span className="brand-tld">.com</span></span>
         </div>
         <p className="muted">{t.footer_line}</p>
         <nav className="footer-nav" aria-label="Footer">

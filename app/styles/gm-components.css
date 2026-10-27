@@ -10,7 +10,7 @@
   --action: var(--color-action); --action-hover: var(--color-action-hover); --on-action: var(--color-on-action);
   --whatsapp: var(--color-whatsapp); --on-whatsapp: var(--color-on-whatsapp);
   --success: var(--color-success); --warning: var(--color-warning); --danger: var(--color-danger); --link: var(--color-link);
-  --emerald-800: var(--color-emerald-800); --emerald-300: var(--color-emerald-300);
+  --emerald-800: var(--color-emerald-800); --emerald-300: var(--color-emerald-300); --accent: var(--color-accent);
   --brass-500: var(--color-brass-500); --ivory-100: var(--color-ivory-100);
 }
 /* Gharmalak components: plain CSS on the tokens. Prefix gm-. Load Poppins, Mukta and Overpass Mono from Google Fonts. */

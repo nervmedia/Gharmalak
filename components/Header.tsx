@@ -12,7 +12,7 @@ export function Header() {
         <Link href="/" className="brand" aria-label="Gharmalak home">
           <Mark size={26} />
           <span className="brand-text">
-            <span className="brand-name">Gharmalak</span>
+            <span className="brand-name">Gharmalak<span className="brand-tld">.com</span></span>
             <span className="brand-desc">{t.descriptor}</span>
           </span>
         </Link>

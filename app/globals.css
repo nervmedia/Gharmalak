@@ -56,10 +56,9 @@ p { margin: 0; }
 .hero-note svg { color: var(--brass); flex: none; }
 .card-stage { position: relative; display: grid; place-items: center; min-height: 340px; perspective: 1200px; }
 @media (min-width: 960px) { .card-stage { min-height: 400px; padding-bottom: 96px; } }
-.card-stage .gm-malak { width: min(380px, 100%); transform: rotateX(8deg) rotateY(-14deg) rotateZ(2deg); transition: transform var(--duration-slow) var(--easing-standard); }
-.card-stage:hover .gm-malak { transform: rotateX(0) rotateY(0) rotateZ(0); }
-.card-stage .gm-malak.back { position: absolute; transform: translate(26px, 34px) rotateX(8deg) rotateY(-14deg) rotateZ(8deg); background: var(--emerald-900); border-color: var(--line-strong); opacity: 0.7; z-index: -1; }
-.card-chip { width: 38px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, var(--brass-300), var(--brass-500) 55%, var(--brass-700)); opacity: 0.9; }
+.card-stage .mc-scene.front { position: relative; z-index: 1; }
+.card-stage .mc-scene.back { position: absolute; z-index: 0; transform: translate(34px, -46px) scale(0.94); opacity: 0.92; }
+@media (min-width: 960px) { .card-stage .mc-scene.back { transform: translate(44px, -96px) scale(0.94); } }
 .card-stage .float { position: absolute; left: -12px; bottom: 0; transform: rotate(-2deg); box-shadow: var(--shadow-lg); }
 @media (max-width: 959px) { .card-stage .float { display: none; } }
 
@@ -145,7 +144,7 @@ p { margin: 0; }
 .form { display: flex; flex-direction: column; gap: var(--space-6); }
 .form .gm-field { width: 100%; }
 .gm-select { appearance: none; -webkit-appearance: none; width: 100%; height: 46px; border: 0; background: transparent; color: var(--ink); font-family: var(--font-display); font-size: 16px; padding: 0 var(--space-3); outline: none; }
-.gm-select option { background: var(--emerald-900); color: var(--ivory-100); }
+.gm-select option { background: var(--surface-raised); color: var(--ink); }
 .select-wrap { position: relative; }
 .select-wrap svg { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--ink-muted); }
 .check { display: flex; gap: var(--space-3); align-items: flex-start; font-size: 15px; color: var(--ink-muted); cursor: pointer; }
@@ -200,3 +199,70 @@ table.data .mono { font-family: var(--font-mono); font-size: 14px; }
 .prose h2 { font-size: 21px; margin: var(--space-8) 0 var(--space-3); }
 .prose p, .prose li { color: var(--ink-muted); }
 .prose p + p { margin-top: var(--space-3); }
+
+/* Lockup: Gharmalak with a small, readable .com */
+.brand-tld { font-family: var(--font-display); font-weight: 500; font-size: max(12px, 0.64em); letter-spacing: 0.02em; color: var(--brass); margin-left: 1px; }
+
+/* Paper sections: ivory islands between graphite ones */
+.section[data-theme="light"] { background: var(--surface); color: var(--ink); border-top-color: transparent; }
+
+/* Metal Malak Card */
+.mc-scene { width: min(380px, 100%); perspective: 1100px; container-type: inline-size; touch-action: pan-y; }
+.mc { --rx: 7deg; --ry: -13deg; --gx: 30; --gy: 20; --edge: #6e5426;
+  position: relative; aspect-ratio: 85.6 / 54; border-radius: 4.8cqw; transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry)); will-change: transform; }
+.mc-titanium { --edge: #1d1e21; }
+.mc-edge { position: absolute; inset: 0; border-radius: inherit; background: var(--edge); transform: translateZ(var(--z)); }
+.mc-edge:first-child { box-shadow: 0 34px 60px -18px rgba(0,0,0,0.85), 0 12px 24px -10px rgba(0,0,0,0.6); }
+.mc-face { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; isolation: isolate;
+  box-shadow: inset 0 1px 0 rgba(255,250,232,0.75), inset 0 -1px 0 rgba(50,34,8,0.55), inset 0 0 0 1px rgba(80,58,18,0.35); }
+.mc-brass .mc-face { background:
+  radial-gradient(120% 90% at 18% 0%, rgba(255,247,222,0.55), transparent 55%),
+  linear-gradient(112deg, #7a5c28 0%, #c4a05c 16%, #f0dcaa 30%, #d6b46f 42%, #9b7a3c 56%, #c7a561 70%, #ecd8a5 84%, #a9884a 100%); }
+.mc-titanium .mc-face { box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.06); background:
+  radial-gradient(120% 90% at 18% 0%, rgba(255,255,255,0.22), transparent 55%),
+  linear-gradient(112deg, #1b1c1f 0%, #45474d 16%, #8a8d94 30%, #5a5d63 42%, #26282c 56%, #50535a 70%, #979aa1 84%, #34363b 100%); }
+.mc-brush { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay; opacity: 0.55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='380'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0015 0.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E");
+  background-size: cover; }
+.mc-titanium .mc-brush { opacity: 0.7; }
+.mc-sheen { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay;
+  background: linear-gradient(100deg, transparent 34%, rgba(255,255,255,0.0) 40%, rgba(255,255,255,0.75) 50%, rgba(255,255,255,0) 60%, transparent 66%);
+  background-size: 260% 100%; background-position: calc(100% - var(--gx) * 1%) 0; }
+.mc-glare { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
+  background: radial-gradient(circle at calc(var(--gx) * 1%) calc(var(--gy) * 1%), rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.35) 18%, transparent 48%); }
+.mc-content { position: relative; z-index: 1; height: 100%; box-sizing: border-box; padding: 6.2cqw 7cqw 6cqw; display: flex; flex-direction: column; justify-content: space-between; }
+.mc-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.mc-over { font-family: var(--font-display); font-size: max(10px, 3cqw); letter-spacing: 0.3em; font-weight: 600; }
+.mc-mark svg { width: 8cqw; height: auto; }
+.mc-mid { display: flex; align-items: center; gap: 4cqw; }
+.mc-chip { position: relative; width: 13cqw; aspect-ratio: 1.32; border-radius: 1.8cqw; overflow: hidden;
+  background:
+    linear-gradient(90deg, transparent 30%, rgba(92,66,22,0.6) 30% 32.5%, transparent 32.5% 67.5%, rgba(92,66,22,0.6) 67.5% 70%, transparent 70%),
+    linear-gradient(0deg, transparent 32%, rgba(92,66,22,0.55) 32% 35%, transparent 35% 65%, rgba(92,66,22,0.55) 65% 68%, transparent 68%),
+    linear-gradient(135deg, #fbefc8 0%, #e2c47f 35%, #b38d45 62%, #ecd59c 100%);
+  box-shadow: 0 0 0 1px rgba(60,42,12,0.55), inset 0 1px 1px rgba(255,255,255,0.7), inset 0 -1px 1px rgba(60,42,12,0.4); }
+.mc-chip span { position: absolute; left: 32.5%; right: 32.5%; top: 35%; bottom: 35%; border-radius: 1cqw; border: 1px solid rgba(92,66,22,0.6); }
+.mc-nfc { width: 7cqw; height: 7cqw; stroke-width: 1.8; }
+.mc-name { margin: 0 0 1.2cqw; font-family: var(--font-display); font-size: max(17px, 6cqw); font-weight: 600; line-height: 1.2; letter-spacing: 0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mc-meta { display: flex; justify-content: space-between; gap: 3cqw; font-family: var(--font-mono); font-size: max(10px, 3.1cqw); letter-spacing: 0.08em; text-transform: uppercase; }
+/* Engraved into brass: dark cut with a lit lower lip */
+.mc-brass .mc-content { color: #3d2f12; text-shadow: 0 1px 0 rgba(255,246,220,0.65), 0 -1px 0 rgba(60,40,8,0.25); }
+.mc-brass .mc-meta { color: #4d3c18; }
+.mc-brass .mc-mark svg, .mc-brass .mc-nfc { filter: drop-shadow(0 1px 0 rgba(255,246,220,0.65)); }
+.mc-brass .mc-nfc { stroke: #3d2f12; }
+/* Etched into titanium: bright cut, brass details */
+.mc-titanium .mc-content { color: #ece8df; text-shadow: 0 -1px 0 rgba(0,0,0,0.7), 0 1px 0 rgba(255,255,255,0.08); }
+.mc-titanium .mc-over { color: #d9bd80; }
+.mc-titanium .mc-meta { color: #c8c4bb; }
+.mc-titanium .mc-nfc { stroke: #c8c4bb; }
+@media (prefers-reduced-motion: reduce) { .mc { will-change: auto; } }
+@media (max-width: 520px) {
+  .header-row { gap: var(--space-3); }
+  .brand { gap: 8px; }
+  .brand-name { font-size: 17px; }
+  .lang-seg button { padding: 0 7px; font-size: 12px; }
+  .card-stage { min-height: 0; padding: 36px 0 8px; }
+  .card-stage .mc-scene.back { transform: translate(14px, -28px) scale(0.94); }
+}
+.round-hero > *, .hero-grid > *, .round-grid > * { min-width: 0; }
