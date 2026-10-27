@@ -25,6 +25,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'invalid' }, { status: 400 });
   }
   const id = 'RES-' + randomBytes(4).toString('hex').toUpperCase();
-  await db.addCheckAnswer({ id, phone, name, building, area, role, years, answers, rating, recommend: body.recommend, status: 'pending', createdAt: new Date().toISOString() });
+  await db.addCheckAnswer({ id, phone, name, building, area, role, years, answers, rating, recommend: body.recommend, calls: body.calls === true, status: 'pending', createdAt: new Date().toISOString() });
   return NextResponse.json({ ok: true, id });
 }

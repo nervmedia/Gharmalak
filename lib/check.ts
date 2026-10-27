@@ -8,10 +8,13 @@ export const check = {
   minResidents: 3,
   hours: 24, // report promised within this many hours
   payoutAnswers: 150, // ₹ to a resident for a completed answer set
-  payoutCall: 200, // ₹ for a 10-minute call
+  payoutCall: 250, // ₹ to the resident or owner for each call
+  callPrice: 499, // ₹ a buyer pays for a call with a verified owner
+  callMinutes: 15,
   paymentLinks: {
     99: process.env.NEXT_PUBLIC_CHECK_PAYMENT_LINK_99 || '',
     299: process.env.NEXT_PUBLIC_CHECK_PAYMENT_LINK_299 || '',
+    499: process.env.NEXT_PUBLIC_CHECK_PAYMENT_LINK_CALL || '',
   } as Record<number, string>,
 };
 
@@ -31,5 +34,15 @@ export const questions = [
   { id: 'deposit', topic: 'Deposit', q: 'How many months of deposit is normal, and do owners return it on time?' },
   { id: 'overall', topic: 'Overall', q: 'Would you recommend living here? Why or why not?' },
 ] as const;
+
+// What buyers want to ask owners who already bought in the tower or township.
+export const buyerTopics = [
+  'Build quality, leakage and finishing',
+  'Was possession on time?',
+  'OC, paperwork and registration',
+  'How the builder handles complaints',
+  'Society handover and maintenance',
+  'Resale and rent in the building',
+];
 
 export type QuestionId = (typeof questions)[number]['id'];

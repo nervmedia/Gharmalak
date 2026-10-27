@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { AlertCircle, ArrowRight, BadgeCheck, IndianRupee, MessageCircle, ShieldCheck, Star, Users } from 'lucide-react';
+import { AlertCircle, ArrowRight, BadgeCheck, IndianRupee, MessageCircle, Phone, ShieldCheck, Star, Users } from 'lucide-react';
 import { check, questions } from '@/lib/check';
 import { inr, waLink } from '@/lib/config';
 
@@ -24,6 +24,7 @@ export function AnswerFlow() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [rating, setRating] = useState(0);
   const [recommend, setRecommend] = useState<boolean | null>(null);
+  const [calls, setCalls] = useState(true);
   const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -59,7 +60,7 @@ export function AnswerFlow() {
     try {
       const res = await fetch('/api/check/answer', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), phone: digits, building: building.trim(), area, role, years, answers, rating, recommend, consent }),
+        body: JSON.stringify({ name: name.trim(), phone: digits, building: building.trim(), area, role, years, answers, rating, recommend, calls, consent }),
       });
       if (!res.ok) throw new Error(String(res.status));
       const d = await res.json();
@@ -83,9 +84,10 @@ export function AnswerFlow() {
         <>
           <p className="overline">For residents of Wakad and Hinjewadi</p>
           <h1>Get paid to help the next family moving in.</h1>
-          <p className="flow-lead">Answer {questions.length} short questions about your building. Once we check you live there, we pay you {inr(check.payoutAnswers)} by UPI, and {inr(check.payoutCall)} more for any 10-minute call a renter asks for.</p>
+          <p className="flow-lead">Answer {questions.length} short questions about your building. Once we check you live there, we pay you {inr(check.payoutAnswers)} by UPI, and {inr(check.payoutCall)} for each {check.callMinutes}-minute call a renter or buyer books with you.</p>
           <ul className="answer-points">
             <li><IndianRupee size={18} /> {inr(check.payoutAnswers)} for your answers, paid by UPI</li>
+            <li><Phone size={18} /> {inr(check.payoutCall)} per call if you choose to take calls</li>
             <li><ShieldCheck size={18} /> Your name and flat number are never shown</li>
             <li><Users size={18} /> Owners and tenants both welcome</li>
           </ul>
@@ -158,6 +160,9 @@ export function AnswerFlow() {
               </div>
               {errors.recommend && <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.recommend}</p>}
             </fieldset>
+            <div className="notice answer-calls">
+              <label className="check"><input type="checkbox" checked={calls} onChange={e => setCalls(e.target.checked)} /> <span><strong>Take paid calls.</strong> {role === 'owner' ? 'People thinking of buying here' : 'People thinking of renting here'} can book a {check.callMinutes}-minute call with you. You get {inr(check.payoutCall)} per call, we connect it so your number stays private, and you can say no to any time slot.</span></label>
+            </div>
             <div>
               <label className="check"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /> <span>Gharmalak may share my answers with renters and buyers without my name. <Link href="/privacy">Privacy</Link></span></label>
               {errors.consent && <p className="gm-error" style={{ marginTop: 8 }}><AlertCircle className="gm-icon" /> {errors.consent}</p>}
@@ -175,7 +180,7 @@ export function AnswerFlow() {
         <>
           <p className="overline">Answers received · {ref}</p>
           <h1>Thank you. One last step.</h1>
-          <p className="flow-lead">Send us a photo of a recent electricity bill, maintenance receipt or rent agreement for {building.trim()} on WhatsApp. We only check the name and address, and delete it within 30 days.</p>
+          <p className="flow-lead">Send us a photo of {role === 'owner' ? 'the first page of your sale agreement or Index II, or a maintenance bill in your name,' : 'your rent agreement, or a recent electricity bill or maintenance receipt,'} for {building.trim()} on WhatsApp. We only check the name and address, and delete it within 30 days.</p>
           <div className="panel stack">
             <div className="notice ok"><BadgeCheck size={16} /> Once you&apos;re verified, we pay {inr(check.payoutAnswers)} to your UPI.</div>
             <a className="gm-btn gm-btn-whatsapp gm-btn-block" href={waLink(`Hi Gharmalak Check, I sent answers for ${building.trim()} (${ref}). Here is my proof of residence:`)} target="_blank" rel="noopener"><MessageCircle size={18} /> Send proof on WhatsApp</a>

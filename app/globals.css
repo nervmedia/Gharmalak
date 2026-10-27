@@ -322,3 +322,15 @@ table.data .mono { font-family: var(--font-mono); font-size: 14px; }
 .answer-text { height: auto; min-height: 72px; padding: 10px 12px; resize: vertical; line-height: 1.5; font-family: var(--font-body); }
 .answer-actions { display: flex; justify-content: space-between; gap: var(--space-3); }
 .answer-actions .gm-btn-primary { flex: 1; }
+.check-options { display: grid; gap: var(--space-2); }
+.check-option { display: flex; gap: var(--space-3); align-items: flex-start; text-align: left; width: 100%; padding: var(--space-3) var(--space-4); border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: transparent; color: var(--ink); cursor: pointer; font: inherit; min-height: var(--touch-target); }
+.check-option svg { color: var(--ink-muted); flex: none; margin-top: 3px; }
+.check-option span { display: flex; flex-direction: column; }
+.check-option strong { font-family: var(--font-display); font-weight: 600; font-size: 15px; }
+.check-option small { color: var(--ink-muted); font-size: 14px; }
+.check-option[aria-pressed="true"] { border-color: var(--brass); background: var(--brass-soft); }
+.check-option[aria-pressed="true"] svg { color: var(--brass); }
+.check-option:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.answer-calls { display: block; }
+.answer-calls .check { color: var(--ink-muted); }
+.answer-calls strong { color: var(--ink); font-family: var(--font-display); font-weight: 600; }

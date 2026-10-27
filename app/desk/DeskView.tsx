@@ -5,8 +5,8 @@ import { Mark } from '@/components/Mark';
 import { inr, site } from '@/lib/config';
 
 type Reg = { phone: string; name: string; area: string; home: string; interests: string[]; lang: string; source: string; status: string; paymentId: string | null; createdAt: string; paidAt: string | null };
-type CheckReq = { id: string; phone: string; name: string; building: string; area: string; purpose: string; moveIn: string; price: number; source: string; status: string; createdAt: string };
-type CheckAns = { id: string; phone: string; name: string; building: string; area: string; role: string; years: string; answers: Record<string, string>; rating: number; recommend: boolean; status: string; createdAt: string };
+type CheckReq = { id: string; phone: string; name: string; building: string; area: string; purpose: string; product?: string; moveIn: string; price: number; source: string; status: string; createdAt: string };
+type CheckAns = { id: string; phone: string; name: string; building: string; area: string; role: string; years: string; answers: Record<string, string>; rating: number; recommend: boolean; calls?: boolean; status: string; createdAt: string };
 type Data = { registrations: Reg[]; optins: { phone: string; createdAt: string }[]; counts: { members: number; paid: number; optins: number }; round: { id: string; target: number; opens: string; closes: string }; storage: string; checkRequests?: CheckReq[]; checkAnswers?: CheckAns[] };
 
 function DeskShell({ children, onLogout }: { children: React.ReactNode; onLogout?: () => void }) {
@@ -167,7 +167,7 @@ export function DeskView() {
         <div><p className="overline">Pune test</p><h1>Gharmalak Check</h1></div>
       </div>
       <div className="kpis">
-        <div className="kpi"><small>Report requests</small><span className="amount">{d?.checkRequests?.length ?? '·'}</span><small>{d?.checkRequests?.filter(r => r.price === 99).length ?? 0} at ₹99 · {d?.checkRequests?.filter(r => r.price === 299).length ?? 0} at ₹299</small></div>
+        <div className="kpi"><small>Report requests</small><span className="amount">{d?.checkRequests?.length ?? '·'}</span><small>{d?.checkRequests?.filter(r => r.price === 99).length ?? 0} at ₹99 · {d?.checkRequests?.filter(r => r.price === 299).length ?? 0} at ₹299 · {d?.checkRequests?.filter(r => r.product === 'call').length ?? 0} owner calls</small></div>
         <div className="kpi"><small>Resident answers</small><span className="amount">{d?.checkAnswers?.length ?? '·'}</span><small>waiting for proof until verified</small></div>
         <div className="kpi"><small>Buildings with 3+ answers</small><span className="amount">{d ? checkCovered : '·'}</span><small>goal 20 of 30</small></div>
         <div className="kpi"><small>Buildings requested</small><span className="amount">{d ? new Set(d.checkRequests?.map(r => r.building.toLowerCase())).size : '·'}</span><small>unique names</small></div>
@@ -182,7 +182,7 @@ export function DeskView() {
                 <td>{r.name}<br /><small className="muted">{r.source}</small></td>
                 <td className="mono">{r.phone}</td>
                 <td>{r.building}<br /><small className="muted">{r.area}</small></td>
-                <td>{r.purpose === 'buy' ? 'Buy' : 'Rent'}</td>
+                <td>{r.purpose === 'buy' ? 'Buy' : 'Rent'}<br /><small className="muted">{r.product === 'call' ? 'Owner call' : 'Report'}</small></td>
                 <td>{r.moveIn.replace('-', ' ')}</td>
                 <td>{inr(r.price)}</td>
                 <td>{fmt(r.createdAt)}</td>
@@ -203,7 +203,7 @@ export function DeskView() {
                 <td>{a.name}<br /><small className="muted">{a.years.replace('-', ' ')} yrs</small></td>
                 <td className="mono">{a.phone}</td>
                 <td>{a.building}<br /><small className="muted">{a.area}</small></td>
-                <td>{a.role === 'owner' ? 'Owner' : 'Tenant'}</td>
+                <td>{a.role === 'owner' ? 'Owner' : 'Tenant'}<br /><small className="muted">{a.calls ? 'Takes calls' : 'No calls'}</small></td>
                 <td>{a.rating} / 5</td>
                 <td>{a.recommend ? 'Yes' : 'No'}</td>
                 <td>{fmt(a.createdAt)}</td>

@@ -26,6 +26,7 @@ export type CheckRequest = {
   building: string;
   area: string;
   purpose: 'rent' | 'buy';
+  product: 'report' | 'call';
   moveIn: string;
   price: number;
   source: string;
@@ -44,6 +45,7 @@ export type CheckAnswer = {
   answers: Record<string, string>;
   rating: number;
   recommend: boolean;
+  calls: boolean; // happy to take paid calls
   status: 'pending' | 'verified' | 'rejected';
   createdAt: string;
 };
@@ -106,6 +108,7 @@ async function pool() {
         building VARCHAR(120) NOT NULL,
         area VARCHAR(40) NOT NULL,
         purpose VARCHAR(10) NOT NULL,
+        product VARCHAR(10) NOT NULL DEFAULT 'report',
         move_in VARCHAR(20) NOT NULL,
         price INT NOT NULL,
         source VARCHAR(60) NOT NULL,
@@ -123,6 +126,7 @@ async function pool() {
         answers TEXT NOT NULL,
         rating TINYINT NOT NULL,
         recommend TINYINT NOT NULL,
+        calls TINYINT NOT NULL DEFAULT 0,
         status VARCHAR(20) NOT NULL DEFAULT 'pending',
         created_at DATETIME NOT NULL
       ) CHARACTER SET utf8mb4`);
@@ -200,8 +204,8 @@ const mysqlStore: Store = {
   async addCheckRequest(r) {
     const p = await pool();
     await p.query(
-      'INSERT INTO check_requests (id,phone,name,building,area,purpose,move_in,price,source,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-      [r.id, r.phone, r.name, r.building, r.area, r.purpose, r.moveIn, r.price, r.source, r.status, toSql(r.createdAt)],
+      'INSERT INTO check_requests (id,phone,name,building,area,purpose,product,move_in,price,source,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+      [r.id, r.phone, r.name, r.building, r.area, r.purpose, r.product, r.moveIn, r.price, r.source, r.status, toSql(r.createdAt)],
     );
   },
   async listCheckRequests() {
@@ -209,7 +213,7 @@ const mysqlStore: Store = {
     const [rows] = await p.query('SELECT * FROM check_requests ORDER BY created_at DESC');
     return (rows as Record<string, unknown>[]).map(r => ({
       id: String(r.id), phone: String(r.phone), name: String(r.name), building: String(r.building), area: String(r.area),
-      purpose: r.purpose === 'buy' ? 'buy' : 'rent', moveIn: String(r.move_in), price: Number(r.price), source: String(r.source),
+      purpose: r.purpose === 'buy' ? 'buy' : 'rent', product: r.product === 'call' ? 'call' : 'report', moveIn: String(r.move_in), price: Number(r.price), source: String(r.source),
       status: (['paid', 'delivered'].includes(String(r.status)) ? r.status : 'requested') as CheckRequest['status'],
       createdAt: fromSql(r.created_at as Date) as string,
     }));
@@ -217,8 +221,8 @@ const mysqlStore: Store = {
   async addCheckAnswer(a) {
     const p = await pool();
     await p.query(
-      'INSERT INTO check_answers (id,phone,name,building,area,role,years,answers,rating,recommend,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-      [a.id, a.phone, a.name, a.building, a.area, a.role, a.years, JSON.stringify(a.answers), a.rating, a.recommend ? 1 : 0, a.status, toSql(a.createdAt)],
+      'INSERT INTO check_answers (id,phone,name,building,area,role,years,answers,rating,recommend,calls,status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [a.id, a.phone, a.name, a.building, a.area, a.role, a.years, JSON.stringify(a.answers), a.rating, a.recommend ? 1 : 0, a.calls ? 1 : 0, a.status, toSql(a.createdAt)],
     );
   },
   async listCheckAnswers() {
@@ -228,7 +232,7 @@ const mysqlStore: Store = {
       id: String(r.id), phone: String(r.phone), name: String(r.name), building: String(r.building), area: String(r.area),
       role: r.role === 'owner' ? 'owner' : 'tenant', years: String(r.years),
       answers: (() => { try { return JSON.parse(String(r.answers)); } catch { return {}; } })(),
-      rating: Number(r.rating), recommend: Number(r.recommend) === 1,
+      rating: Number(r.rating), recommend: Number(r.recommend) === 1, calls: Number(r.calls) === 1,
       status: (['verified', 'rejected'].includes(String(r.status)) ? r.status : 'pending') as CheckAnswer['status'],
       createdAt: fromSql(r.created_at as Date) as string,
     }));
