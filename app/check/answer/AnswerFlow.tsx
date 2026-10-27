@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { AlertCircle, ArrowRight, BadgeCheck, IndianRupee, MessageCircle, Phone, ShieldCheck, Star, Users } from 'lucide-react';
-import { check, questions } from '@/lib/check';
+import { check, households, questions, type Household } from '@/lib/check';
 import { inr, waLink } from '@/lib/config';
 
 type Role = '' | 'owner' | 'tenant';
@@ -21,6 +21,7 @@ export function AnswerFlow() {
   const [area, setArea] = useState('');
   const [role, setRole] = useState<Role>('');
   const [years, setYears] = useState<Years>('');
+  const [household, setHousehold] = useState<Household | ''>('');
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [rating, setRating] = useState(0);
   const [recommend, setRecommend] = useState<boolean | null>(null);
@@ -41,6 +42,7 @@ export function AnswerFlow() {
     if (!area) err.area = 'Pick the area.';
     if (!role) err.role = 'Do you own or rent?';
     if (!years) err.years = 'How long have you lived there?';
+    if (!household) err.household = 'Who do you live here as?';
     setErrors(err);
     if (Object.keys(err).length) return;
     setStep(2);
@@ -60,7 +62,7 @@ export function AnswerFlow() {
     try {
       const res = await fetch('/api/check/answer', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), phone: digits, building: building.trim(), area, role, years, answers, rating, recommend, calls, consent }),
+        body: JSON.stringify({ name: name.trim(), phone: digits, building: building.trim(), area, role, years, household, answers, rating, recommend, calls, consent }),
       });
       if (!res.ok) throw new Error(String(res.status));
       const d = await res.json();
@@ -124,6 +126,11 @@ export function AnswerFlow() {
               <legend className="gm-label">Lived here for</legend>
               <div className="gm-chips">{YEARS.map(y => <button key={y.id} type="button" className="gm-chip" aria-pressed={years === y.id} onClick={() => setYears(y.id)}>{y.label}</button>)}</div>
               {errors.years && <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.years}</p>}
+            </fieldset>
+            <fieldset className="gm-field plain-fieldset">
+              <legend className="gm-label">You live here as</legend>
+              <div className="gm-chips">{households.map(h => <button key={h.id} type="button" className="gm-chip" aria-pressed={household === h.id} onClick={() => setHousehold(h.id)}>{h.label}</button>)}</div>
+              {errors.household ? <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.household}</p> : <p className="gm-hint">We send you questions from people who will live here the same way.</p>}
             </fieldset>
             <button type="submit" className="gm-btn gm-btn-primary gm-btn-block check-cta">Next: the {questions.length} questions <ArrowRight size={18} /></button>
           </form>

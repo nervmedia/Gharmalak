@@ -18,6 +18,16 @@ export const check = {
   } as Record<number, string>,
 };
 
+// Who someone lives as. Renters and buyers are matched with residents of the same kind,
+// so a bachelor hears from bachelors and a family from families.
+export const households = [
+  { id: 'bachelor', label: 'Bachelor or sharing' },
+  { id: 'couple', label: 'Couple' },
+  { id: 'family', label: 'Family' },
+] as const;
+export type Household = (typeof households)[number]['id'];
+export const householdIds: string[] = households.map(h => h.id);
+
 // Buildings with at least 3 verified residents. Add names here as residents are verified;
 // they appear as suggestions in the search box and are marked "ready".
 export const coveredBuildings: string[] = [];

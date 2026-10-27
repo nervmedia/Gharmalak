@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { db } from '@/lib/db';
 import { cleanPhone, cleanText } from '@/lib/validate';
-import { check, questions } from '@/lib/check';
+import { check, householdIds, questions } from '@/lib/check';
 import { ipOf, limited } from '@/lib/ratelimit';
 
 const YEARS = ['under-1', '1-3', '3-plus'];
@@ -16,15 +16,16 @@ export async function POST(req: Request) {
   const area = check.areas.includes(body.area) ? body.area : null;
   const role = body.role === 'owner' ? 'owner' : body.role === 'tenant' ? 'tenant' : null;
   const years = YEARS.includes(body.years) ? body.years : null;
+  const household = householdIds.includes(body.household) ? body.household : null;
   const rating = Math.round(Number(body.rating));
   const raw = body.answers && typeof body.answers === 'object' ? body.answers : {};
   const answers: Record<string, string> = {};
   for (const q of questions) answers[q.id] = cleanText(raw[q.id], 600);
   const filled = Object.values(answers).filter(a => a.length >= 2).length;
-  if (!phone || name.length < 2 || building.length < 2 || !area || !role || !years || !(rating >= 1 && rating <= 5) || typeof body.recommend !== 'boolean' || filled < 8 || body.consent !== true) {
+  if (!phone || name.length < 2 || building.length < 2 || !area || !role || !years || !household || !(rating >= 1 && rating <= 5) || typeof body.recommend !== 'boolean' || filled < 8 || body.consent !== true) {
     return NextResponse.json({ error: 'invalid' }, { status: 400 });
   }
   const id = 'RES-' + randomBytes(4).toString('hex').toUpperCase();
-  await db.addCheckAnswer({ id, phone, name, building, area, role, years, answers, rating, recommend: body.recommend, calls: body.calls === true, status: 'pending', createdAt: new Date().toISOString() });
+  await db.addCheckAnswer({ id, phone, name, building, area, role, years, household, answers, rating, recommend: body.recommend, calls: body.calls === true, status: 'pending', createdAt: new Date().toISOString() });
   return NextResponse.json({ ok: true, id });
 }

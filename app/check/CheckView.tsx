@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AlertCircle, ArrowRight, BadgeCheck, Building2, ChevronDown, Clock, MessageCircle, Phone, Search, ShieldCheck, Star, UserCheck, Users } from 'lucide-react';
-import { buyerTopics, check, coveredBuildings, questions } from '@/lib/check';
+import { AlertCircle, ArrowRight, BadgeCheck, Building2, ChevronDown, MessageCircle, Phone, Search, ShieldCheck, Star, UserCheck, Users } from 'lucide-react';
+import { buyerTopics, check, coveredBuildings, households, questions, type Household } from '@/lib/check';
 import { inr, waLink } from '@/lib/config';
 
 type Purpose = '' | 'rent' | 'buy';
@@ -45,6 +45,7 @@ export function CheckView() {
   const [area, setArea] = useState('');
   const [purpose, setPurpose] = useState<Purpose>('');
   const [product, setProduct] = useState<Product>('report');
+  const [household, setHousehold] = useState<Household | ''>('');
   const [moveIn, setMoveIn] = useState<MoveIn>('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -85,6 +86,7 @@ export function CheckView() {
     e.preventDefault();
     const err: Record<string, string> = {};
     if (!purpose) err.purpose = 'Are you renting or buying?';
+    if (!household) err.household = 'Tell us who is moving in, so we match you with the right residents.';
     if (!moveIn) err.moveIn = 'When are you moving?';
     if (name.trim().length < 2) err.name = 'Please enter your name.';
     if (!/^[6-9]\d{9}$/.test(digits)) err.phone = 'Enter a 10-digit WhatsApp number.';
@@ -95,7 +97,7 @@ export function CheckView() {
     try {
       const res = await fetch('/api/check/request', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ building: building.trim(), area, purpose, product: isCall ? 'call' : 'report', moveIn, name: name.trim(), phone: digits, consent, price, source }),
+        body: JSON.stringify({ building: building.trim(), area, purpose, product: isCall ? 'call' : 'report', household, moveIn, name: name.trim(), phone: digits, consent, price, source }),
       });
       if (!res.ok) throw new Error(String(res.status));
       const d = await res.json();
@@ -169,6 +171,13 @@ export function CheckView() {
                       <button type="button" className="gm-chip" aria-pressed={purpose === 'buy'} onClick={() => choosePurpose('buy')}>Buying</button>
                     </div>
                     {errors.purpose && <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.purpose}</p>}
+                  </fieldset>
+                  <fieldset className="gm-field plain-fieldset">
+                    <legend className="gm-label">Moving in as</legend>
+                    <div className="gm-chips">
+                      {households.map(h => <button key={h.id} type="button" className="gm-chip" aria-pressed={household === h.id} onClick={() => setHousehold(h.id)}>{h.label}</button>)}
+                    </div>
+                    {errors.household ? <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.household}</p> : <p className="gm-hint">You hear from residents like you: bachelors from bachelors, families from families.</p>}
                   </fieldset>
                   {purpose === 'buy' && (
                     <fieldset className="gm-field plain-fieldset">
@@ -317,7 +326,7 @@ export function CheckView() {
             <article className="why"><span className="why-icon"><ShieldCheck size={22} /></span><h3>Verified</h3><p>Each resident shows an electricity bill, maintenance receipt or rent agreement for that building.</p></article>
             <article className="why"><span className="why-icon"><Users size={22} /></span><h3>Tenants and owners</h3><p>Tenants often know the most about living there, so we ask both.</p></article>
             <article className="why"><span className="why-icon"><BadgeCheck size={22} /></span><h3>Nobody pays to look good</h3><p>Brokers, builders and owners can&apos;t pay to change a report, ever.</p></article>
-            <article className="why"><span className="why-icon"><Clock size={22} /></span><h3>Fast</h3><p>Within {check.hours} hours for covered buildings, so you can decide before the deposit is due.</p></article>
+            <article className="why"><span className="why-icon"><UserCheck size={22} /></span><h3>People like you</h3><p>A bachelor hears from bachelors, a family from families, so the answers fit your life.</p></article>
           </div>
         </div>
       </section>
@@ -328,6 +337,7 @@ export function CheckView() {
           <div className="faq">
             {[
               ['What if you don’t cover my building?', `Request it anyway. We find at least ${check.minResidents} residents and message you within 48 hours. You pay only when they’re confirmed.`],
+              ['Why does it ask if I’m a bachelor, couple or family?', 'Because the same building can be great for one and hard for another. We match you with residents who live there the same way you will, so you hear about the issues that matter to you.'],
               ['Who are the residents?', 'People who live in that building now, owners and tenants. We check a bill or rent agreement before their answers count, and they are paid a small fee for their time.'],
               ['Will residents see my number?', 'No. All answers come through Gharmalak. Residents never see who asked.'],
               ['Can I talk to someone who lives there?', `Yes. Buyers can book a ${check.callMinutes}-minute call with a verified owner for ${inr(check.callPrice)}, and renters can add a call after their report. We connect the call, so numbers stay private.`],
