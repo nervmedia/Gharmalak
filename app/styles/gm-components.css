@@ -1,0 +1,138 @@
+/* Gharmalak components (gm- prefix). Load tokens.css first.
+   The component rules below read short names (--surface, --ink, --brass ...).
+   This alias block maps them to the --color-* tokens in tokens.css and
+   re-resolves inside any [data-theme] island, so light "Paper" sections work. */
+:root, [data-theme] {
+  --surface: var(--color-surface); --surface-raised: var(--color-surface-raised); --surface-sunken: var(--color-surface-sunken);
+  --line: var(--color-line); --line-strong: var(--color-line-strong);
+  --ink: var(--color-ink); --ink-muted: var(--color-ink-muted);
+  --brass: var(--color-brass); --brass-soft: var(--color-brass-soft); --on-brass: var(--color-on-brass);
+  --action: var(--color-action); --action-hover: var(--color-action-hover); --on-action: var(--color-on-action);
+  --whatsapp: var(--color-whatsapp); --on-whatsapp: var(--color-on-whatsapp);
+  --success: var(--color-success); --warning: var(--color-warning); --danger: var(--color-danger); --link: var(--color-link);
+  --emerald-800: var(--color-emerald-800); --emerald-300: var(--color-emerald-300);
+  --brass-500: var(--color-brass-500); --ivory-100: var(--color-ivory-100);
+}
+/* Gharmalak components: plain CSS on the tokens. Prefix gm-. Load Poppins, Mukta and Overpass Mono from Google Fonts. */
+body { margin: 0; font-family: var(--font-body); font-size: 16px; line-height: 26px; background: var(--surface); color: var(--ink); }
+.gm-stage { padding: var(--space-6); display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
+.gm-stage-col { padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; }
+.gm-icon { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.gm-overline { font-family: var(--font-display); font-size: 11px; line-height: 16px; letter-spacing: 0.28em; text-transform: uppercase; font-weight: 500; color: var(--ink-muted); margin: 0; }
+.gm-amount { font-family: var(--font-display); font-weight: 600; font-size: 28px; line-height: 32px; font-variant-numeric: tabular-nums; color: var(--ink); margin: 0; }
+.gm-caption { font-size: 12px; line-height: 18px; color: var(--ink-muted); margin: 0; }
+
+/* Button */
+.gm-btn { font-family: var(--font-display); font-weight: 600; font-size: 15px; line-height: 20px; min-height: var(--touch-target); padding: 0 var(--space-5); border-radius: var(--radius-md); border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); cursor: pointer; text-decoration: none; box-sizing: border-box; transition: background-color var(--duration-fast) var(--easing-standard); }
+.gm-btn-primary { background: var(--action); color: var(--on-action); }
+.gm-btn-primary:hover { background: var(--action-hover); }
+.gm-btn-secondary { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+.gm-btn-secondary:hover { background: var(--surface-sunken); }
+.gm-btn-ghost { background: transparent; color: var(--brass); padding: 0 var(--space-3); }
+.gm-btn-whatsapp { background: var(--whatsapp); color: var(--on-whatsapp); }
+.gm-btn-block { width: 100%; }
+.gm-btn:disabled, .gm-btn[aria-disabled="true"] { background: var(--surface-sunken); color: var(--ink-muted); border-color: var(--line); cursor: not-allowed; }
+.gm-btn:focus-visible, .gm-chip:focus-visible, .gm-seg button:focus-visible, .gm-tab:focus-visible { outline: 2px solid transparent; box-shadow: var(--focus-ring); }
+
+/* Field */
+.gm-field { display: flex; flex-direction: column; gap: var(--space-2); width: 320px; max-width: 100%; }
+.gm-label { font-family: var(--font-display); font-size: 14px; font-weight: 500; line-height: 20px; color: var(--ink); }
+.gm-input-wrap { display: flex; align-items: center; min-height: 48px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface-sunken); box-sizing: border-box; }
+.gm-input-wrap:focus-within { border-color: var(--brass); box-shadow: var(--focus-ring); }
+.gm-input-prefix { padding: 0 var(--space-3); align-self: stretch; display: flex; align-items: center; color: var(--ink-muted); border-right: 1px solid var(--line); font-family: var(--font-display); font-size: 15px; }
+.gm-input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font-family: var(--font-display); font-size: 16px; padding: 0 var(--space-3); height: 46px; outline: none; font-variant-numeric: tabular-nums; }
+.gm-hint { font-size: 13px; line-height: 18px; color: var(--ink-muted); margin: 0; }
+.gm-field-error .gm-input-wrap { border-color: var(--danger); }
+.gm-error { font-size: 13px; line-height: 18px; color: var(--danger); margin: 0; display: flex; gap: var(--space-1); align-items: center; }
+.gm-error .gm-icon { width: 16px; height: 16px; }
+
+/* Chip */
+.gm-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.gm-chip { font-family: var(--font-display); font-size: 14px; font-weight: 500; line-height: 20px; min-height: var(--touch-target); padding: 0 var(--space-4); border-radius: var(--radius-full); border: 1px solid var(--line-strong); background: transparent; color: var(--ink); display: inline-flex; align-items: center; gap: var(--space-2); cursor: pointer; transition: background-color var(--duration-base) var(--easing-standard); }
+.gm-chip .gm-icon { width: 16px; height: 16px; }
+.gm-chip[aria-pressed="true"] { background: var(--brass-soft); border-color: var(--brass); color: var(--brass); }
+
+/* Badge */
+.gm-badge { display: inline-flex; align-items: center; gap: var(--space-1); font-family: var(--font-display); font-size: 12px; font-weight: 500; line-height: 16px; padding: var(--space-1) var(--space-2); border-radius: var(--radius-full); border: 1px solid currentColor; white-space: nowrap; }
+.gm-badge .gm-icon { width: 14px; height: 14px; }
+.gm-badge-verified { color: var(--success); }
+.gm-badge-founding { color: var(--brass); background: var(--brass-soft); border-color: transparent; }
+.gm-badge-pending { color: var(--warning); }
+.gm-badge-danger { color: var(--danger); }
+.gm-badge-neutral { color: var(--ink-muted); }
+
+/* Malak Card: the member card. Always emerald, in both themes. */
+.gm-malak { width: 340px; max-width: 100%; aspect-ratio: 85.6 / 54; box-sizing: border-box; border-radius: var(--radius-lg); background: var(--emerald-800); border: 1px solid var(--brass-500); padding: var(--space-5) var(--space-6); display: flex; flex-direction: column; justify-content: space-between; color: var(--ivory-100); box-shadow: var(--shadow-lg); }
+.gm-malak-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.gm-malak-mark { width: 40px; height: 40px; }
+.gm-malak-over { font-family: var(--font-display); font-size: 11px; line-height: 16px; letter-spacing: 0.28em; color: var(--brass-500); font-weight: 500; }
+.gm-malak-name { font-family: var(--font-display); font-size: 21px; font-weight: 600; line-height: 28px; margin: 0; }
+.gm-malak-meta { display: flex; justify-content: space-between; gap: var(--space-3); font-family: var(--font-mono); font-size: 12px; line-height: 18px; letter-spacing: 0.06em; color: var(--emerald-300); }
+
+/* Deal card: one round */
+.gm-deal { width: 360px; max-width: 100%; box-sizing: border-box; background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-4); }
+.gm-deal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-3); }
+.gm-deal-title { font-family: var(--font-display); font-size: 20px; font-weight: 600; line-height: 28px; margin: 0; display: flex; align-items: center; gap: var(--space-2); }
+.gm-deal-title .gm-icon { color: var(--brass); width: 22px; height: 22px; }
+.gm-deal-sub { font-size: 14px; line-height: 22px; color: var(--ink-muted); margin: 0; }
+.gm-well { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-3); padding: var(--space-4); background: var(--surface-sunken); border-radius: var(--radius-md); }
+.gm-progress { height: 6px; border-radius: var(--radius-full); background: var(--surface-sunken); overflow: hidden; }
+.gm-progress > span { display: block; height: 100%; background: var(--brass); border-radius: inherit; }
+.gm-deal-foot { display: flex; justify-content: space-between; gap: var(--space-3); font-size: 14px; line-height: 22px; color: var(--ink-muted); }
+.gm-deal-foot strong { color: var(--ink); font-family: var(--font-display); font-weight: 600; }
+
+/* Round steps */
+.gm-steps { list-style: none; margin: 0; padding: 0; width: 340px; max-width: 100%; }
+.gm-step { display: grid; grid-template-columns: 28px 1fr; column-gap: var(--space-3); position: relative; padding-bottom: var(--space-4); }
+.gm-step::before { content: ""; position: absolute; left: 13px; top: 30px; bottom: 2px; width: 2px; background: var(--line-strong); }
+.gm-step:last-child::before { display: none; }
+.gm-step-dot { width: 28px; height: 28px; border-radius: var(--radius-full); border: 2px solid var(--line-strong); box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 12px; font-weight: 600; color: var(--ink-muted); background: var(--surface); }
+.gm-step-dot .gm-icon { width: 14px; height: 14px; stroke-width: 2.4; }
+.gm-step-done .gm-step-dot { background: var(--brass); border-color: var(--brass); color: var(--on-brass); }
+.gm-step-current .gm-step-dot { border-color: var(--brass); color: var(--brass); }
+.gm-step-title { font-family: var(--font-display); font-size: 15px; font-weight: 600; line-height: 28px; margin: 0; }
+.gm-step-body { grid-column: 2; font-size: 14px; line-height: 22px; color: var(--ink-muted); margin: 0; }
+
+/* List and document row */
+.gm-list { width: 400px; max-width: 100%; background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; }
+.gm-doc { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--line); min-height: 64px; box-sizing: border-box; }
+.gm-doc:last-child { border-bottom: 0; }
+.gm-doc-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); background: var(--surface-sunken); display: flex; align-items: center; justify-content: center; color: var(--brass); flex: none; }
+.gm-doc-main { flex: 1; min-width: 0; }
+.gm-doc-title { font-family: var(--font-display); font-weight: 500; font-size: 15px; line-height: 22px; margin: 0; }
+.gm-doc-meta { font-size: 13px; line-height: 18px; color: var(--ink-muted); margin: 0; }
+
+/* Plan card */
+.gm-plan { width: 320px; max-width: 100%; box-sizing: border-box; background: var(--surface-raised); border: 1px solid var(--brass); border-radius: var(--radius-lg); padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); }
+.gm-plan-price { display: flex; align-items: baseline; gap: var(--space-2); }
+.gm-plan-price .gm-amount { font-size: 40px; line-height: 48px; }
+.gm-plan-per { color: var(--ink-muted); font-size: 16px; }
+.gm-ticks { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.gm-ticks li { display: flex; gap: var(--space-2); align-items: flex-start; font-size: 15px; line-height: 24px; }
+.gm-ticks .gm-icon { color: var(--brass); margin-top: 2px; }
+
+/* Language switch */
+.gm-seg { display: inline-flex; padding: var(--space-1); border-radius: var(--radius-full); background: var(--surface-sunken); border: 1px solid var(--line-strong); gap: var(--space-1); }
+.gm-seg button { font-family: var(--font-display); font-weight: 500; font-size: 14px; line-height: 20px; min-height: 36px; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-full); background: transparent; color: var(--ink-muted); cursor: pointer; }
+.gm-seg button[aria-pressed="true"] { background: var(--surface-raised); color: var(--ink); box-shadow: var(--shadow-sm); }
+
+/* Tab bar (phones) */
+.gm-tabbar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); width: 390px; max-width: 100%; background: var(--surface-sunken); border-top: 1px solid var(--line); }
+.gm-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 60px; font-family: var(--font-display); font-weight: 500; font-size: 11px; line-height: 14px; color: var(--ink-muted); text-decoration: none; }
+.gm-tab .gm-icon { width: 22px; height: 22px; }
+.gm-tab[aria-current="page"] { color: var(--brass); }
+
+/* Deal alert (WhatsApp preview) */
+.gm-alert { width: 360px; max-width: 100%; box-sizing: border-box; display: flex; gap: var(--space-3); padding: var(--space-4); background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.gm-alert-badge { width: 36px; height: 36px; border-radius: var(--radius-full); background: var(--whatsapp); color: var(--on-whatsapp); display: flex; align-items: center; justify-content: center; flex: none; }
+.gm-alert-body { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.gm-alert-from { font-family: var(--font-display); font-weight: 600; font-size: 14px; line-height: 20px; margin: 0; display: flex; justify-content: space-between; gap: var(--space-3); }
+.gm-alert-from span { font-weight: 400; color: var(--ink-muted); font-size: 12px; }
+.gm-alert-text { font-size: 15px; line-height: 24px; margin: 0; white-space: pre-line; }
+
+/* Logo lockups */
+.gm-lockup { display: inline-flex; align-items: center; gap: 0.5em; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.005em; line-height: 1; }
+.gm-lockup img { height: 1.6em; width: auto; }
+.gm-lockup-stack { display: inline-flex; flex-direction: column; align-items: center; gap: 0.35em; font-family: var(--font-display); font-weight: 600; line-height: 1; }
+.gm-lockup-stack img { height: 2.2em; width: auto; }
+.gm-descriptor { display: block; font-family: var(--font-display); font-size: 0.24em; letter-spacing: 0.36em; font-weight: 500; color: var(--brass); margin-top: 0.6em; }
