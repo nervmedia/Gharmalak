@@ -1,11 +1,10 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { AlertCircle, ArrowRight, BadgeCheck, IndianRupee, MessageCircle, Phone, ShieldCheck, Star, Users } from 'lucide-react';
+import { AlertCircle, ArrowRight, BadgeCheck, FileCheck, IndianRupee, MessageCircle, Phone, ShieldCheck, Star } from 'lucide-react';
 import { check, households, questions, type Household } from '@/lib/check';
 import { inr, waLink } from '@/lib/config';
 
-type Role = '' | 'owner' | 'tenant';
 type Years = '' | 'under-1' | '1-3' | '3-plus';
 const YEARS: { id: Years; label: string }[] = [
   { id: 'under-1', label: 'Under 1 year' },
@@ -19,7 +18,6 @@ export function AnswerFlow() {
   const [phone, setPhone] = useState('');
   const [building, setBuilding] = useState('');
   const [area, setArea] = useState('');
-  const [role, setRole] = useState<Role>('');
   const [years, setYears] = useState<Years>('');
   const [household, setHousehold] = useState<Household | ''>('');
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -40,9 +38,8 @@ export function AnswerFlow() {
     if (!/^[6-9]\d{9}$/.test(digits)) err.phone = 'Enter a 10-digit WhatsApp number.';
     if (building.trim().length < 2) err.building = 'Type your society or building name.';
     if (!area) err.area = 'Pick the area.';
-    if (!role) err.role = 'Do you own or rent?';
-    if (!years) err.years = 'How long have you lived there?';
-    if (!household) err.household = 'Who do you live here as?';
+    if (!years) err.years = 'How long have you owned it?';
+    if (!household) err.household = 'Who lives in the flat?';
     setErrors(err);
     if (Object.keys(err).length) return;
     setStep(2);
@@ -62,7 +59,7 @@ export function AnswerFlow() {
     try {
       const res = await fetch('/api/check/answer', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), phone: digits, building: building.trim(), area, role, years, household, answers, rating, recommend, calls, consent }),
+        body: JSON.stringify({ name: name.trim(), phone: digits, building: building.trim(), area, role: 'owner', years, household, answers, rating, recommend, calls, consent }),
       });
       if (!res.ok) throw new Error(String(res.status));
       const d = await res.json();
@@ -84,14 +81,14 @@ export function AnswerFlow() {
 
       {step === 1 && (
         <>
-          <p className="overline">For residents of Wakad and Hinjewadi</p>
-          <h1>Get paid to help the next family moving in.</h1>
-          <p className="flow-lead">Answer {questions.length} short questions about your building. Once we check you live there, we pay you {inr(check.payoutAnswers)} by UPI, and {inr(check.payoutCall)} for each {check.callMinutes}-minute call a renter or buyer books with you.</p>
+          <p className="overline">For flat owners in Wakad and Hinjewadi</p>
+          <h1>Get paid to help the next buyer in your building.</h1>
+          <p className="flow-lead">You bought in your building and know what the brochure left out. Answer {questions.length} short questions for people thinking of buying there. Once we check you own a flat there, we pay you {inr(check.payoutAnswers)} by UPI, and {inr(check.payoutCall)} for each {check.callMinutes}-minute call a buyer books with you.</p>
           <ul className="answer-points">
             <li><IndianRupee size={18} /> {inr(check.payoutAnswers)} for your answers, paid by UPI</li>
             <li><Phone size={18} /> {inr(check.payoutCall)} per call if you choose to take calls</li>
             <li><ShieldCheck size={18} /> Your name and flat number are never shown</li>
-            <li><Users size={18} /> Owners and tenants both welcome</li>
+            <li><FileCheck size={18} /> Owners only, checked with your sale papers or a bill in your name</li>
           </ul>
           <form className="panel form" onSubmit={next} noValidate>
             <div className={`gm-field ${errors.name ? 'gm-field-error' : ''}`}>
@@ -102,10 +99,10 @@ export function AnswerFlow() {
             <div className={`gm-field ${errors.phone ? 'gm-field-error' : ''}`}>
               <label className="gm-label" htmlFor="a-phone">WhatsApp number</label>
               <div className="gm-input-wrap"><span className="gm-input-prefix">+91</span><input id="a-phone" className="gm-input" inputMode="numeric" autoComplete="tel-national" value={phone} onChange={e => setPhone(e.target.value.replace(/[^\d\s]/g, '').slice(0, 12))} /></div>
-              {errors.phone ? <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.phone}</p> : <p className="gm-hint">We pay you and verify you on this number. Renters never see it.</p>}
+              {errors.phone ? <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.phone}</p> : <p className="gm-hint">We pay you and verify you on this number. Buyers never see it.</p>}
             </div>
             <div className={`gm-field ${errors.building ? 'gm-field-error' : ''}`}>
-              <label className="gm-label" htmlFor="a-building">Society or building name</label>
+              <label className="gm-label" htmlFor="a-building">Building or project name</label>
               <div className="gm-input-wrap"><input id="a-building" className="gm-input" autoComplete="off" value={building} onChange={e => setBuilding(e.target.value.slice(0, 120))} /></div>
               {errors.building && <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.building}</p>}
             </div>
@@ -115,22 +112,14 @@ export function AnswerFlow() {
               {errors.area && <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.area}</p>}
             </fieldset>
             <fieldset className="gm-field plain-fieldset">
-              <legend className="gm-label">You</legend>
-              <div className="gm-chips">
-                <button type="button" className="gm-chip" aria-pressed={role === 'tenant'} onClick={() => setRole('tenant')}>Rent here</button>
-                <button type="button" className="gm-chip" aria-pressed={role === 'owner'} onClick={() => setRole('owner')}>Own and live here</button>
-              </div>
-              {errors.role && <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.role}</p>}
-            </fieldset>
-            <fieldset className="gm-field plain-fieldset">
-              <legend className="gm-label">Lived here for</legend>
+              <legend className="gm-label">Owned here for</legend>
               <div className="gm-chips">{YEARS.map(y => <button key={y.id} type="button" className="gm-chip" aria-pressed={years === y.id} onClick={() => setYears(y.id)}>{y.label}</button>)}</div>
               {errors.years && <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.years}</p>}
             </fieldset>
             <fieldset className="gm-field plain-fieldset">
-              <legend className="gm-label">You live here as</legend>
+              <legend className="gm-label">The flat is home to</legend>
               <div className="gm-chips">{households.map(h => <button key={h.id} type="button" className="gm-chip" aria-pressed={household === h.id} onClick={() => setHousehold(h.id)}>{h.label}</button>)}</div>
-              {errors.household ? <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.household}</p> : <p className="gm-hint">We send you questions from people who will live here the same way.</p>}
+              {errors.household ? <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.household}</p> : <p className="gm-hint">We match you with buyers who will live there the same way.</p>}
             </fieldset>
             <button type="submit" className="gm-btn gm-btn-primary gm-btn-block check-cta">Next: the {questions.length} questions <ArrowRight size={18} /></button>
           </form>
@@ -160,7 +149,7 @@ export function AnswerFlow() {
               {errors.rating && <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.rating}</p>}
             </fieldset>
             <fieldset className="gm-field plain-fieldset">
-              <legend className="gm-label">Would you recommend living here?</legend>
+              <legend className="gm-label">Would you buy here again?</legend>
               <div className="gm-chips">
                 <button type="button" className="gm-chip" aria-pressed={recommend === true} onClick={() => setRecommend(true)}>Yes</button>
                 <button type="button" className="gm-chip" aria-pressed={recommend === false} onClick={() => setRecommend(false)}>No</button>
@@ -168,10 +157,10 @@ export function AnswerFlow() {
               {errors.recommend && <p className="gm-error"><AlertCircle className="gm-icon" /> {errors.recommend}</p>}
             </fieldset>
             <div className="notice answer-calls">
-              <label className="check"><input type="checkbox" checked={calls} onChange={e => setCalls(e.target.checked)} /> <span><strong>Take paid calls.</strong> {role === 'owner' ? 'People thinking of buying here' : 'People thinking of renting here'} can book a {check.callMinutes}-minute call with you. You get {inr(check.payoutCall)} per call, we connect it so your number stays private, and you can say no to any time slot.</span></label>
+              <label className="check"><input type="checkbox" checked={calls} onChange={e => setCalls(e.target.checked)} /> <span><strong>Take paid calls.</strong> People thinking of buying here can book a {check.callMinutes}-minute call with you. You get {inr(check.payoutCall)} per call, we connect it so your number stays private, and you can say no to any time slot.</span></label>
             </div>
             <div>
-              <label className="check"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /> <span>Gharmalak may share my answers with renters and buyers without my name. <Link href="/privacy">Privacy</Link></span></label>
+              <label className="check"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /> <span>Gharmalak may share my answers with homebuyers without my name. <Link href="/privacy">Privacy</Link></span></label>
               {errors.consent && <p className="gm-error" style={{ marginTop: 8 }}><AlertCircle className="gm-icon" /> {errors.consent}</p>}
             </div>
             {errors.server && <div className="notice err" role="alert">{errors.server}</div>}
@@ -187,11 +176,11 @@ export function AnswerFlow() {
         <>
           <p className="overline">Answers received · {ref}</p>
           <h1>Thank you. One last step.</h1>
-          <p className="flow-lead">Send us a photo of {role === 'owner' ? 'the first page of your sale agreement or Index II, or a maintenance bill in your name,' : 'your rent agreement, or a recent electricity bill or maintenance receipt,'} for {building.trim()} on WhatsApp. We only check the name and address, and delete it within 30 days.</p>
+          <p className="flow-lead">Send us a photo of the first page of your sale agreement or Index II, or a maintenance bill in your name, for {building.trim()} on WhatsApp. We only check the name and address, and delete it within 30 days.</p>
           <div className="panel stack">
             <div className="notice ok"><BadgeCheck size={16} /> Once you&apos;re verified, we pay {inr(check.payoutAnswers)} to your UPI.</div>
-            <a className="gm-btn gm-btn-whatsapp gm-btn-block" href={waLink(`Hi Gharmalak Check, I sent answers for ${building.trim()} (${ref}). Here is my proof of residence:`)} target="_blank" rel="noopener"><MessageCircle size={18} /> Send proof on WhatsApp</a>
-            <p className="gm-hint">Neighbours in the same building can answer too. Each verified resident is paid.</p>
+            <a className="gm-btn gm-btn-whatsapp gm-btn-block" href={waLink(`Hi Gharmalak Check, I sent answers for ${building.trim()} (${ref}). Here is my proof of ownership:`)} target="_blank" rel="noopener"><MessageCircle size={18} /> Send proof on WhatsApp</a>
+            <p className="gm-hint">Other owners in your building can answer too. Each verified owner is paid.</p>
           </div>
         </>
       )}

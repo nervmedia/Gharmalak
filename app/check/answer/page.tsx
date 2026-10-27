@@ -3,8 +3,8 @@ import { CheckHeader, CheckFooter } from '@/components/CheckShell';
 import { AnswerFlow } from './AnswerFlow';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Gharmalak Check · For residents' },
-  description: 'Live in Wakad or Hinjewadi? Answer 10 questions about your building and get paid by UPI. Your name is never shown.',
+  title: { absolute: 'Gharmalak Check · For owners' },
+  description: 'Own a flat in Wakad or Hinjewadi? Answer 10 questions for homebuyers and get paid by UPI. Your name is never shown.',
   robots: { index: false, follow: false },
 };
 

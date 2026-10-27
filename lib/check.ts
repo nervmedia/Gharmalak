@@ -1,14 +1,15 @@
-// Gharmalak Check: verified resident reviews for renters and buyers. Pune test, Wakad and Hinjewadi.
+// Gharmalak Check: homebuyers talk to verified owners before they buy. Pune test, Wakad and Hinjewadi.
 // Kept apart from the Nagpur club on purpose: Check pages never mention rounds or the club.
+// A later owner-side idea: help owners rent out their own flats.
 
 export const check = {
   city: 'Pune',
   areas: ['Wakad', 'Hinjewadi', 'Other'],
   prices: [99, 299] as const, // price test: each visitor sees one, picked at random
-  minResidents: 3,
+  minOwners: 3,
   hours: 24, // report promised within this many hours
-  payoutAnswers: 150, // ₹ to a resident for a completed answer set
-  payoutCall: 250, // ₹ to the resident or owner for each call
+  payoutAnswers: 150, // ₹ to an owner for a completed answer set
+  payoutCall: 250, // ₹ to the owner for each call
   callPrice: 499, // ₹ a buyer pays for a call with a verified owner
   callMinutes: 15,
   paymentLinks: {
@@ -18,7 +19,7 @@ export const check = {
   } as Record<number, string>,
 };
 
-// Who someone lives as. Renters and buyers are matched with residents of the same kind,
+// Who someone lives as. Buyers are matched with owners of the same kind,
 // so a bachelor hears from bachelors and a family from families.
 export const households = [
   { id: 'bachelor', label: 'Bachelor or sharing' },
@@ -28,31 +29,21 @@ export const households = [
 export type Household = (typeof households)[number]['id'];
 export const householdIds: string[] = households.map(h => h.id);
 
-// Buildings with at least 3 verified residents. Add names here as residents are verified;
+// Buildings with at least 3 verified owners. Add names here as owners are verified;
 // they appear as suggestions in the search box and are marked "ready".
 export const coveredBuildings: string[] = [];
 
 export const questions = [
-  { id: 'water', topic: 'Water', q: 'Is there a water shortage in summer? Do you use tanker water?' },
-  { id: 'power', topic: 'Power', q: 'How often does the power go, and is there backup for lifts and flats?' },
-  { id: 'maintenance', topic: 'Maintenance', q: 'What is the monthly maintenance charge, and is it worth it?' },
-  { id: 'rules', topic: 'Rules for tenants', q: 'Any rules on bachelors, pets, food or guests?' },
-  { id: 'security', topic: 'Security and parking', q: 'How are the guards, CCTV and visitor parking?' },
-  { id: 'noise', topic: 'Noise and neighbours', q: 'Any construction nearby, loud events or traffic noise?' },
-  { id: 'office', topic: 'Society office', q: 'When something breaks, does the society office get it fixed?' },
-  { id: 'rent', topic: 'Real rent', q: 'What do 1, 2 and 3 BHK flats really rent for here?' },
-  { id: 'deposit', topic: 'Deposit', q: 'How many months of deposit is normal, and do owners return it on time?' },
-  { id: 'overall', topic: 'Overall', q: 'Would you recommend living here? Why or why not?' },
+  { id: 'build', topic: 'Build quality', q: 'Any leakage, seepage, cracks or poor finishing in your flat or the common areas?' },
+  { id: 'possession', topic: 'Possession', q: 'Did you get possession on the promised date? How late was it?' },
+  { id: 'papers', topic: 'Papers', q: 'Is the OC in place, and did registration and the loan go smoothly?' },
+  { id: 'builder', topic: 'Builder after the sale', q: 'When something broke after possession, did the builder fix it?' },
+  { id: 'utilities', topic: 'Water and power', q: 'Any water shortage or tanker water in summer? How often does the power go?' },
+  { id: 'maintenance', topic: 'Maintenance and society', q: 'What is the monthly maintenance, and has the society been handed over?' },
+  { id: 'security', topic: 'Security and parking', q: 'How are the guards, CCTV and parking, for residents and visitors?' },
+  { id: 'area', topic: 'The neighbourhood', q: 'Roads, traffic, schools, hospitals and shops nearby. Any construction coming up?' },
+  { id: 'value', topic: 'Value', q: 'Did your flat hold its value? What do flats here resell or rent for now?' },
+  { id: 'overall', topic: 'Overall', q: 'Would you buy here again? Why or why not?' },
 ] as const;
-
-// What buyers want to ask owners who already bought in the tower or township.
-export const buyerTopics = [
-  'Build quality, leakage and finishing',
-  'Was possession on time?',
-  'OC, paperwork and registration',
-  'How the builder handles complaints',
-  'Society handover and maintenance',
-  'Resale and rent in the building',
-];
 
 export type QuestionId = (typeof questions)[number]['id'];

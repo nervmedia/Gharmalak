@@ -22,8 +22,8 @@ export default function Privacy() {
         <h2>Your choices</h2>
         <p>Reply STOP on WhatsApp to stop messages. To see, correct or delete your data, message us on WhatsApp. We will reply within 7 days.</p>
         <h2>Gharmalak Check (Pune)</h2>
-        <p>If you request a building report, we keep your name, WhatsApp number, the building and when you plan to move, to send you the report. Residents never see your number.</p>
-        <p>If you answer as a resident, we keep your name, WhatsApp number, building and answers. Your answers are shared with renters and buyers without your name, phone or flat number. The bill or rent agreement you send as proof is used only to check that you live there, and is deleted within 30 days.</p>
+        <p>If you ask to talk to an owner or for written answers about a building, we keep your name, WhatsApp number, the building and when you plan to decide, to set up your call or send the answers. Owners never see your number, and we connect calls without showing either side&apos;s number.</p>
+        <p>If you answer as an owner, we keep your name, WhatsApp number, building and answers. Your answers are shared with homebuyers without your name, phone or flat number. The sale agreement, Index II or bill you send as proof is used only to check that you own a flat there, and is deleted within 30 days.</p>
         <p>We do not sell your data.</p>
       </div></main>
       <Footer />

@@ -168,7 +168,7 @@ export function DeskView() {
       </div>
       <div className="kpis">
         <div className="kpi"><small>Report requests</small><span className="amount">{d?.checkRequests?.length ?? '·'}</span><small>{d?.checkRequests?.filter(r => r.price === 99).length ?? 0} at ₹99 · {d?.checkRequests?.filter(r => r.price === 299).length ?? 0} at ₹299 · {d?.checkRequests?.filter(r => r.product === 'call').length ?? 0} owner calls</small></div>
-        <div className="kpi"><small>Resident answers</small><span className="amount">{d?.checkAnswers?.length ?? '·'}</span><small>waiting for proof until verified</small></div>
+        <div className="kpi"><small>Owner answers</small><span className="amount">{d?.checkAnswers?.length ?? '·'}</span><small>waiting for proof until verified</small></div>
         <div className="kpi"><small>Buildings with 3+ answers</small><span className="amount">{d ? checkCovered : '·'}</span><small>goal 20 of 30</small></div>
         <div className="kpi"><small>Buildings requested</small><span className="amount">{d ? new Set(d.checkRequests?.map(r => r.building.toLowerCase())).size : '·'}</span><small>unique names</small></div>
       </div>
@@ -195,7 +195,7 @@ export function DeskView() {
       </div>
       <div className="table-wrap">
         <table className="data">
-          <thead><tr><th>Answer</th><th>Resident</th><th>WhatsApp</th><th>Building</th><th>Role</th><th>Rating</th><th>Recommend</th><th>When</th></tr></thead>
+          <thead><tr><th>Answer</th><th>Owner</th><th>WhatsApp</th><th>Building</th><th>Role</th><th>Rating</th><th>Recommend</th><th>When</th></tr></thead>
           <tbody>
             {d?.checkAnswers?.map(a => (
               <tr key={a.id} title={Object.entries(a.answers).map(([k, v]) => `${k}: ${v}`).join('\n')}>
@@ -211,7 +211,7 @@ export function DeskView() {
             ))}
           </tbody>
         </table>
-        {d && !d.checkAnswers?.length && <div className="empty">No resident answers yet.</div>}
+        {d && !d.checkAnswers?.length && <div className="empty">No owner answers yet.</div>}
       </div>
     </DeskShell>
   );
