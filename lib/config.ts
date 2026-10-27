@@ -3,7 +3,7 @@ export const site = {
   whatsapp: (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '').replace(/\D/g, ''),
   paymentLink: process.env.NEXT_PUBLIC_RAZORPAY_PAYMENT_LINK || '',
   fee: 499, // launch price until 31 Dec 2026
-  regularFee: 1999, // from 1 Jan 2027
+  regularFee: 999, // from 1 Jan 2027
   foundingSeats: 1000, // first Nagpur members whose fee comes off their first deal
 };
 

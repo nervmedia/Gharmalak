@@ -6,7 +6,7 @@ import { site } from '@/lib/config';
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: { default: 'Gharmalak · Homeowners’ club, Nagpur', template: '%s · Gharmalak' },
-  description: 'A club of Nagpur homeowners. One group deal a month, a price set by 10 local quotes, and verified vendors who must beat it by 10%. Launch price ₹499 a year (regular ₹1,999).',
+  description: 'A club of Nagpur homeowners. One group deal a month, a price set by 10 local quotes, and verified vendors who must beat it by 10%. Launch price ₹499 a year (regular ₹999).',
   openGraph: { type: 'website', siteName: 'Gharmalak', locale: 'en_IN', images: ['/og.png'] },
   robots: { index: true, follow: true },
 };
