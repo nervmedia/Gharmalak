@@ -21,6 +21,9 @@ export default function Privacy() {
         <p>On servers in India or with Indian data handling, for as long as you are a member and for up to 2 years after, unless the law asks us to keep it longer.</p>
         <h2>Your choices</h2>
         <p>Reply STOP on WhatsApp to stop messages. To see, correct or delete your data, message us on WhatsApp. We will reply within 7 days.</p>
+        <h2>Gharmalak Check (Pune)</h2>
+        <p>If you request a building report, we keep your name, WhatsApp number, the building and when you plan to move, to send you the report. Residents never see your number.</p>
+        <p>If you answer as a resident, we keep your name, WhatsApp number, building and answers. Your answers are shared with renters and buyers without your name, phone or flat number. The bill or rent agreement you send as proof is used only to check that you live there, and is deleted within 30 days.</p>
         <p>We do not sell your data.</p>
       </div></main>
       <Footer />
