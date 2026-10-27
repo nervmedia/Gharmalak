@@ -16,6 +16,9 @@ export function Home() {
   const stats = useStats();
   const optins = stats?.optins ?? 0;
   const pct = Math.min(100, Math.round((optins / currentRound.target) * 100));
+  const seatsTaken = Math.min(site.foundingSeats, stats?.members ?? 0);
+  const seatsPct = Math.round((seatsTaken / site.foundingSeats) * 100);
+  const seatsLabel = t.plan_seats.replace('{n}', (site.foundingSeats - seatsTaken).toLocaleString('en-IN'));
   const closes = new Date(currentRound.closes).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 
   return (
@@ -117,17 +120,23 @@ export function Home() {
         <section className="section" id="join">
           <div className="wrap plan-wrap">
             <div className="gm-plan">
-              <p className="overline">{t.plan_title}</p>
-              <div className="gm-plan-price"><span className="gm-amount amount">{inr(site.fee)}</span><span className="gm-plan-per">{t.plan_per}</span></div>
+              <div className="plan-head"><p className="overline">{t.plan_title}</p><span className="plan-badge">{t.plan_badge}</span></div>
+              <div className="gm-plan-price"><s className="plan-was">{inr(site.regularFee)}</s><span className="gm-amount amount">{inr(site.fee)}</span><span className="gm-plan-per">{t.plan_per}</span></div>
+              <p className="plan-save"><BadgeCheck size={18} /> {t.plan_save}</p>
               <ul className="gm-ticks">
                 {[t.plan_t1, t.plan_t2, t.plan_t3, t.plan_t4].map(x => <li key={x}><Check className="gm-icon" size={20} /> {x}</li>)}
               </ul>
+              <div className="meter">
+                <div className="gm-progress" role="progressbar" aria-valuenow={seatsTaken} aria-valuemin={0} aria-valuemax={site.foundingSeats} aria-label={seatsLabel}><span style={{ width: `${Math.max(seatsPct, 2)}%` }} /></div>
+                <div className="meter-row"><span>{seatsLabel}</span></div>
+              </div>
               <Link href="/join" className="gm-btn gm-btn-primary gm-btn-block">{t.hero_cta}</Link>
+              <p className="plan-note">{t.plan_note}</p>
             </div>
             <div>
               <h2 style={{ fontSize: 28, marginBottom: 16 }}>{t.faq_title}</h2>
               <div className="faq">
-                {[1, 2, 3, 4].map(n => (
+                {[5, 1, 2, 3, 4].map(n => (
                   <details key={n}>
                     <summary>{t[`faq${n}_q` as 'faq1_q']} <ChevronDown size={20} /></summary>
                     <p>{t[`faq${n}_a` as 'faq1_a']}</p>

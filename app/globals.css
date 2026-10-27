@@ -53,7 +53,7 @@ p { margin: 0; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-8); }
 .hero-ctas .gm-btn { min-height: 52px; padding: 0 var(--space-6); font-size: 16px; }
 .hero-note { margin-top: var(--space-4); font-size: 15px; color: var(--ink-muted); display: flex; align-items: center; gap: 8px; }
-.hero-note svg { color: var(--brass); flex: none; }
+.hero-note svg { color: var(--accent); flex: none; }
 .card-stage { position: relative; display: grid; place-items: center; min-height: 340px; perspective: 1200px; }
 @media (min-width: 960px) { .card-stage { min-height: 400px; padding-bottom: 96px; } }
 .card-stage .mc-scene.front { position: relative; z-index: 1; }
@@ -106,7 +106,15 @@ p { margin: 0; }
 .plan-wrap { display: grid; gap: var(--space-8); align-items: start; }
 @media (min-width: 960px) { .plan-wrap { grid-template-columns: 1fr 1fr; } }
 .plan-wrap .gm-plan { width: 100%; max-width: 440px; padding: var(--space-8); box-shadow: var(--shadow-lg); }
-.plan-was { color: var(--ink-muted); text-decoration: line-through; font-family: var(--font-display); }
+.plan-was { color: var(--ink-muted); text-decoration: line-through; text-decoration-color: var(--danger); text-decoration-thickness: 2px; font-family: var(--font-display); font-weight: 500; font-size: 22px; }
+.plan-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
+.plan-badge { font-family: var(--font-display); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: var(--on-brass); background: var(--brass); border-radius: 999px; padding: 3px 10px; white-space: nowrap; }
+.plan-save { display: flex; gap: 8px; align-items: center; color: var(--accent); font-family: var(--font-display); font-weight: 500; font-size: 15px; }
+.plan-save svg { flex: none; }
+.plan-note { color: var(--ink-muted); font-size: 14px; text-align: center; }
+.pay-price { display: flex; align-items: baseline; gap: var(--space-3); flex-wrap: wrap; }
+.pay-price .amount { font-size: 34px; line-height: 1.1; }
+.pay-price .plan-badge { align-self: center; }
 
 .faq { border-top: 1px solid var(--line); }
 .faq details { border-bottom: 1px solid var(--line); }

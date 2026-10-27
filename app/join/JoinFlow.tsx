@@ -1,10 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AlertCircle, ArrowRight, ChevronDown, MessageCircle, ShieldCheck } from 'lucide-react';
+import { AlertCircle, ArrowRight, BadgeCheck, ChevronDown, MessageCircle, ShieldCheck } from 'lucide-react';
 import { useLang } from '@/components/LangProvider';
 import { MalakCard } from '@/components/MalakCard';
-import { areas, site, waLink } from '@/lib/config';
+import { areas, inr, site, waLink } from '@/lib/config';
 
 type Form = { name: string; phone: string; area: string; home: '' | 'house' | 'flat'; interests: string[]; consent: boolean };
 const INTERESTS = ['solar', 'painting', 'waterproofing', 'other'] as const;
@@ -128,6 +128,8 @@ export function JoinFlow() {
           <h1>{t.pay_title}</h1>
           <p className="flow-lead">{t.pay_body}</p>
           <div className="panel stack">
+            <div className="pay-price"><s className="plan-was">{inr(site.regularFee)}</s><span className="amount">{inr(site.fee)}</span><span className="plan-badge">{t.plan_badge}</span></div>
+            <p className="plan-save"><BadgeCheck size={18} /> {t.pay_credit}</p>
             <div className="notice"><span className="amount" style={{ color: 'var(--ink)' }}>+91 {f.phone.replace(/\D/g, '').slice(-10)}</span></div>
             {site.paymentLink ? (
               <a className="gm-btn gm-btn-primary gm-btn-block" style={{ minHeight: 52 }} href={site.paymentLink} target="_blank" rel="noopener" onClick={() => setTimeout(() => setStep(3), 800)}>{t.pay_cta}</a>
