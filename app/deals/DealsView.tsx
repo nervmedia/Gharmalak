@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AlertCircle, ArrowRight, BatteryCharging, Bug, Check, Droplets, Flame, Paintbrush, ShieldCheck, Snowflake, Sun, Umbrella } from 'lucide-react';
-import { deals, dealCities, monthLabel, type DealKind } from '@/lib/deals';
-import { currentRound, inr, site } from '@/lib/config';
+import { AlertCircle, AppWindow, ArrowRight, Bath, BatteryCharging, Blinds, Bug, Cctv, Check, ChefHat, CloudRain, CookingPot, Droplets, Fan, Flame, Layers, LocateFixed, Paintbrush, Refrigerator, ShieldCheck, Snowflake, Sofa, Sun, Umbrella } from 'lucide-react';
+import { dateLabel, dealRunsIn, deals, launchCities, laterCities, nearestCity, rounds, tierLabel, type Deal, type DealKind } from '@/lib/deals';
+import { inr, site } from '@/lib/config';
 
 const ICONS: Record<DealKind, typeof Sun> = {
   solar: Sun, heater: Flame, painting: Paintbrush, cooling: Snowflake, backup: BatteryCharging, waterproofing: Umbrella, pest: Bug, water: Droplets,
+  security: Cctv, kitchen: ChefHat, fans: Fan, appliances: CookingPot, coolroof: Layers, rainwater: CloudRain, windows: AppWindow,
+  bathroom: Bath, furniture: Sofa, decor: Blinds, whitegoods: Refrigerator,
 };
 
 function sourceFromUrl() {
@@ -21,6 +23,9 @@ export function DealsView() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('Nagpur');
+  const [viewCity, setViewCity] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locNote, setLocNote] = useState('');
   const [consent, setConsent] = useState(false);
   const [source, setSource] = useState('direct');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -32,11 +37,44 @@ export function DealsView() {
     const want = new URLSearchParams(window.location.search).get('deal');
     if (want && deals.some(d => d.id === want)) setPicked([want]);
     try { const p = localStorage.getItem('gm_phone'); if (p) setPhone(p); } catch {}
+    let saved: string | null = null;
+    try { saved = localStorage.getItem('gm_city'); } catch {}
+    if (saved) chooseCity(saved);
+    else navigator.permissions?.query({ name: 'geolocation' }).then(s => { if (s.state === 'granted') detect(); }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function chooseCity(c: string) {
+    setViewCity(c);
+    setCity(c);
+    try { localStorage.setItem('gm_city', c); } catch {}
+  }
+
+  // Location is read on this device only, matched to the nearest city, and never sent anywhere.
+  function detect() {
+    if (!('geolocation' in navigator)) { setLocNote('This browser cannot detect location. Pick your city below.'); return; }
+    setLocating(true);
+    setLocNote('');
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const near = nearestCity(pos.coords.latitude, pos.coords.longitude);
+        chooseCity(near.city);
+        setLocNote(near.city === 'Other' ? 'You are not near a city we cover yet.' : `Found you near ${near.city}.`);
+        setLocating(false);
+      },
+      () => { setLocNote('Could not get your location. Pick your city below.'); setLocating(false); },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 3600000 },
+    );
+  }
+
+  const inLaunch = viewCity ? launchCities.includes(viewCity) : true;
+  const shown = viewCity && inLaunch ? deals.filter(d => dealRunsIn(d, viewCity)) : deals;
+  const hiddenCount = deals.length - shown.length;
 
   const toggle = (id: string) => setPicked(p => (p.includes(id) ? p.filter(x => x !== id) : [...p, id]));
   const digits = phone.replace(/\D/g, '').slice(-10);
   const today = new Date().toISOString().slice(0, 10);
+  const cityName = viewCity === 'Other' ? 'your city' : viewCity;
   const founding = today <= '2026-12-31';
 
   async function submit(e: React.FormEvent) {
@@ -71,38 +109,55 @@ export function DealsView() {
         <div className="wrap">
           <p className="overline">Free to browse · No payment to show interest</p>
           <h1>Every deal for the <em>next 12 months.</em></h1>
-          <p className="hero-body">One group round a month, timed to the weather: solar before summer, waterproofing before the monsoon, painting before Diwali. Tap the deals you want. We&apos;ll WhatsApp you when each round opens, with the price to beat.</p>
+          <p className="hero-body">Deals run in rounds, named by when the work is done. You opt in during the two months before, vendors bid for the whole group, and installation follows. Nothing is installed in the monsoon. Round 1 is rooftop solar: opt in from 1 November, installed in January.</p>
           <p className="hero-note"><ShieldCheck size={18} /> Only top-rated, brand-certified installers. Members get the group price; browsing and showing interest are free.</p>
         </div>
       </section>
 
       <section className="section" style={{ paddingTop: 0, borderTop: 0 }}>
         <div className="wrap">
-          <ol className="deals-grid" aria-label="Deals by month">
-            {deals.map(d => {
-              const Icon = ICONS[d.kind];
-              const on = picked.includes(d.id);
-              const live = d.roundHref && d.id.includes(currentRound.category) && d.month === currentRound.opens.slice(0, 7);
+          <div className="panel city-bar">
+            <div className="city-bar-head">
+              <div>
+                <p className="overline">Deals near you</p>
+                <h2 style={{ fontSize: 22 }}>{!viewCity ? 'All launch cities' : inLaunch ? `Deals in ${viewCity}` : `Not in ${cityName} yet`}</h2>
+              </div>
+              <button type="button" className="gm-btn gm-btn-secondary" onClick={detect} disabled={locating}><LocateFixed size={18} /> {locating ? 'Finding you…' : 'Detect my city'}</button>
+            </div>
+            {locNote && <p className="muted" role="status" style={{ margin: 0 }}>{locNote}</p>}
+            <div className="gm-chips">
+              {launchCities.map(c => <button key={c} type="button" className="gm-chip" aria-pressed={viewCity === c} onClick={() => chooseCity(c)}>{c}</button>)}
+              <select className={`gm-chip city-select ${viewCity && !inLaunch ? 'city-select-on' : ''}`} aria-label="Another city" value={viewCity && !inLaunch ? viewCity : ''} onChange={e => e.target.value && chooseCity(e.target.value)}>
+                <option value="">Another city…</option>
+                {[...laterCities, 'Other'].map(c => <option key={c} value={c}>{c === 'Other' ? 'Somewhere else' : c}</option>)}
+              </select>
+            </div>
+            {viewCity && !inLaunch && <p className="muted" style={{ margin: 0 }}>We start in Maharashtra cities on MSEDCL power, where one solar installer can cover them all: {launchCities.join(', ')}. Tap the deals you would want anyway; we count {viewCity === 'Other' ? 'each city' : `${viewCity}`}&apos;s interest to decide where we go next.</p>}
+            {viewCity && inLaunch && hiddenCount > 0 && <p className="muted" style={{ margin: 0 }}>{hiddenCount} more deals need a local crew and start in Nagpur first.</p>}
+            <p className="muted" style={{ margin: 0, fontSize: 13 }}>Your location stays on your phone. We only use it to pick your city.</p>
+          </div>
+
+          <div className="deal-months">
+            {rounds.map(r => {
+              const list = shown.filter(d => d.round === r.n);
+              if (!list.length) return null;
+              const status = today < r.optInFrom ? `Opt-ins open ${dateLabel(r.optInFrom)}` : today <= r.optInTo ? 'Opt-ins open now' : 'Opt-ins closed';
               return (
-                <li key={d.id} className={`deal-card ${on ? 'deal-card-on' : ''}`}>
-                  <div className="deal-card-top">
-                    <span className="deal-month">{monthLabel(d.month)}</span>
-                    {live && <span className="gm-badge gm-badge-founding">Round 1 · opens {new Date(currentRound.opens).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
+                <section key={r.n} className="deal-month-row" aria-label={`Round ${r.n}`}>
+                  {r.n === 4 && <p className="monsoon-note"><CloudRain size={18} /> June to September: no installations during the monsoon. We use these months to collect opt-ins for October.</p>}
+                  <div className="round-head">
+                    <h2 className="deal-month">Round {r.n} · installed {r.install}</h2>
+                    <span className={`gm-badge ${today >= r.optInFrom && today <= r.optInTo ? 'gm-badge-verified' : 'gm-badge-pending'}`}>{status}</span>
                   </div>
-                  <h2 className="deal-title"><Icon size={20} /> {d.title}</h2>
-                  <p className="muted deal-why">{d.why}</p>
-                  <p className="deal-brands">{d.brands}</p>
-                  <div className="deal-actions">
-                    <button type="button" className="gm-chip" aria-pressed={on} onClick={() => toggle(d.id)}>
-                      {on ? <><Check size={16} /> Interested</> : "I'm interested"}
-                    </button>
-                    {live && <Link href={d.roundHref!} className="deal-link">See the round <ArrowRight size={14} /></Link>}
-                  </div>
-                </li>
+                  <p className="muted round-optin">Opt in {dateLabel(r.optInFrom)} to {dateLabel(r.optInTo)}</p>
+                  <ol className="deals-grid deals-pair">
+                    {list.map(d => <DealCard key={d.id} d={d} on={picked.includes(d.id)} onToggle={() => toggle(d.id)} />)}
+                  </ol>
+                </section>
               );
             })}
-          </ol>
-          <p className="muted" style={{ marginTop: 16, fontSize: 14 }}>Dates are for Nagpur. Other cities follow as they open; pick your city below so we know where to go next. Brand names show the kind of installer we work with, not a signed partnership.</p>
+          </div>
+          <p className="muted" style={{ marginTop: 16, fontSize: 14 }}>Prices are typical spends per home, not quotes. Deals marked for a local crew start in Nagpur and follow in other cities as we sign crews. Brand names show the kind of vendor we work with, not a signed partnership.</p>
         </div>
       </section>
 
@@ -142,7 +197,11 @@ export function DealsView() {
               <fieldset className="gm-field plain-fieldset">
                 <legend className="gm-label">City</legend>
                 <div className="gm-chips">
-                  {dealCities.map(c => <button key={c} type="button" className="gm-chip" aria-pressed={city === c} onClick={() => setCity(c)}>{c}</button>)}
+                  {launchCities.map(c => <button key={c} type="button" className="gm-chip" aria-pressed={city === c} onClick={() => setCity(c)}>{c}</button>)}
+                  <select className={`gm-chip city-select ${launchCities.includes(city) ? '' : 'city-select-on'}`} aria-label="Another city" value={launchCities.includes(city) ? '' : city} onChange={e => e.target.value && setCity(e.target.value)}>
+                    <option value="">Another city…</option>
+                    {[...laterCities, 'Other'].map(c => <option key={c} value={c}>{c === 'Other' ? 'Somewhere else' : c}</option>)}
+                  </select>
                 </div>
               </fieldset>
               <label className="check">
@@ -157,5 +216,28 @@ export function DealsView() {
         </div>
       </section>
     </>
+  );
+}
+
+function DealCard({ d, on, onToggle }: { d: Deal; on: boolean; onToggle: () => void }) {
+  const Icon = ICONS[d.kind];
+  const live = !!d.roundHref;
+  return (
+    <li className={`deal-card ${d.tier === 'big' ? 'deal-card-big' : ''} ${on ? 'deal-card-on' : ''}`}>
+      <div className="deal-card-top">
+        <span className={`deal-tier deal-tier-${d.tier}`}>{tierLabel[d.tier]}</span>
+        {live && <span className="gm-badge gm-badge-founding">Launch deal</span>}
+      </div>
+      <h3 className="deal-title"><Icon size={20} /> {d.title}</h3>
+      <p className="deal-ticket">{d.ticket}</p>
+      <p className="muted deal-why">{d.why}</p>
+      <p className="deal-brands">{d.brands}</p>
+      <div className="deal-actions">
+        <button type="button" className="gm-chip" aria-pressed={on} onClick={onToggle}>
+          {on ? <><Check size={16} /> Interested</> : "I'm interested"}
+        </button>
+        {live && <Link href={d.roundHref!} className="deal-link">See the round <ArrowRight size={14} /></Link>}
+      </div>
+    </li>
   );
 }

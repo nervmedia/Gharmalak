@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Download, Lock, LogOut, RefreshCw, Search, MessageCircle, Check } from 'lucide-react';
 import { Mark } from '@/components/Mark';
 import { inr, site } from '@/lib/config';
-import { deals, monthLabel } from '@/lib/deals';
+import { deals, reachLabel, roundOf, tierLabel } from '@/lib/deals';
 
 type Reg = { phone: string; name: string; area: string; home: string; interests: string[]; lang: string; source: string; status: string; paymentId: string | null; createdAt: string; paidAt: string | null };
 type CheckReq = { id: string; phone: string; name: string; building: string; area: string; purpose: string; product?: string; household?: string; moveIn: string; price: number; source: string; status: string; createdAt: string };
@@ -175,12 +175,12 @@ export function DeskView() {
       </div>
       <div className="table-wrap">
         <table className="data">
-          <thead><tr><th>Deal</th><th>Month</th><th>Picks</th><th>Non-members</th><th>By city</th><th>By source</th></tr></thead>
+          <thead><tr><th>Deal</th><th>Round</th><th>Type</th><th>Vendor reach</th><th>Picks</th><th>Non-members</th><th>By city</th><th>By source</th></tr></thead>
           <tbody>
             {deals.map(dl => {
               const list = d?.dealInterests?.filter(i => i.dealId === dl.id) ?? [];
               const tally = (key: 'city' | 'source') => { const m = new Map<string, number>(); list.forEach(i => m.set(i[key], (m.get(i[key]) || 0) + 1)); return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${k} ${v}`).join(', '); };
-              return <tr key={dl.id}><td>{dl.title}</td><td>{monthLabel(dl.month)}</td><td>{list.length}</td><td>{list.filter(i => !i.member).length}</td><td>{tally('city')}</td><td>{tally('source')}</td></tr>;
+              return <tr key={dl.id}><td>{dl.title}</td><td>R{dl.round} · {roundOf(dl).install}</td><td>{tierLabel[dl.tier]}</td><td>{reachLabel[dl.reach]}</td><td>{list.length}</td><td>{list.filter(i => !i.member).length}</td><td>{tally('city')}</td><td>{tally('source')}</td></tr>;
             })}
           </tbody>
         </table>

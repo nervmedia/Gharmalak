@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const phone = cleanPhone(body.phone);
   const name = cleanText(body.name, 120);
   const city = dealCities.includes(body.city) ? body.city : null;
-  const ids: string[] = Array.isArray(body.deals) ? body.deals.filter((x: unknown) => dealIds.includes(String(x))).slice(0, 12) : [];
+  const ids: string[] = Array.isArray(body.deals) ? body.deals.filter((x: unknown) => dealIds.includes(String(x))).slice(0, dealIds.length) : [];
   const source = cleanText(body.source, 120) || 'direct';
   if (!phone || name.length < 2 || !city || !ids.length || body.consent !== true) {
     return NextResponse.json({ error: 'invalid' }, { status: 400 });

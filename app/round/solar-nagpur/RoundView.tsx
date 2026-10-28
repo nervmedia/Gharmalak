@@ -89,7 +89,7 @@ export function RoundView() {
           {state === 'done' && <div className="notice ok" role="status">{t.r_opt_done}</div>}
           {state === 'already' && <div className="notice ok" role="status">{t.r_opt_already}</div>}
           {state === 'notmember' && <div className="notice err" role="alert">{t.r_opt_notmember} <Link href="/join">{t.nav_join}</Link></div>}
-          <a className="gm-btn gm-btn-whatsapp gm-btn-block" href={waLink('YES, opt me in to Round 1: rooftop solar, Nagpur.')} target="_blank" rel="noopener"><MessageCircle size={18} /> WhatsApp: YES</a>
+          <a className="gm-btn gm-btn-whatsapp gm-btn-block" href={waLink('YES, opt me in to Round 1: rooftop solar, installed in January.')} target="_blank" rel="noopener"><MessageCircle size={18} /> WhatsApp: YES</a>
         </form>
       </aside>
     </div>
