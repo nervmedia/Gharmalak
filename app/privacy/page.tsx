@@ -22,7 +22,7 @@ export default function Privacy() {
         <h2>Your choices</h2>
         <p>Reply STOP on WhatsApp to stop messages. To see, correct or delete your data, message us on WhatsApp. We will reply within 7 days.</p>
         <h2>My home reminders</h2>
-        <p>If you save reminders, we keep your name, WhatsApp number, the kind of reminder (for example &ldquo;property tax&rdquo;), its due date, how often it repeats and how many days before to remind you. We never ask for bill amounts, account, consumer or property numbers.</p>
+        <p>If you save reminders, we keep your name, WhatsApp number, the kind of reminder (for example &ldquo;AC service&rdquo;), its due date, how often it repeats and how many days before to remind you. We never ask for amounts, account, consumer or property numbers.</p>
         <p>We use these only to remind you on WhatsApp. Nobody can look up your reminders by typing your number. Delete them anytime from the same phone, reply STOP, or ask us on WhatsApp.</p>
         <h2>Gharmalak Check (Pune)</h2>
         <p>If you ask to talk to an owner or for written answers about a building, we keep your name, WhatsApp number, the building and when you plan to decide, to set up your call or send the answers. Owners never see your number, and we connect calls without showing either side&apos;s number.</p>

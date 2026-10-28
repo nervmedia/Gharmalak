@@ -88,9 +88,9 @@ export function MyHomeView() {
       <section className="hero">
         <div className="wrap">
           <p className="overline">My home · Free during launch</p>
-          <h1>Never miss a <em>home bill</em> again.</h1>
-          <p className="hero-line">Add your due dates once. We remind you on WhatsApp a few days before.</p>
-          <p className="hero-note"><Lock size={18} /> Dates only. No amounts, account or consumer numbers. Delete anytime. Never sold.</p>
+          <h1>Home care on time, <em>at club rates</em>.</h1>
+          <p className="hero-line">Add the date once. We remind you on WhatsApp, with the club deal for the job.</p>
+          <p className="hero-note"><Lock size={18} /> Dates only. No amounts or account numbers. Delete anytime. Never sold.</p>
         </div>
       </section>
 

@@ -4,8 +4,8 @@ import { Footer } from '@/components/Footer';
 import { MyHomeView } from './MyHomeView';
 
 export const metadata: Metadata = {
-  title: 'My home reminders',
-  description: 'Never miss a home bill or service again. Add your property tax, electricity, society maintenance, insurance and service dates, and Gharmalak reminds you on WhatsApp.',
+  title: 'Home care reminders',
+  description: 'Home care on time, at club rates. Gharmalak reminds you on WhatsApp when your AC service, RO filter, tank cleaning, pest control, leak check or inverter battery is due, with the club deal for the job.',
 };
 
 export default function MyHomePage() {

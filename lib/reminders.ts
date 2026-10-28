@@ -1,23 +1,18 @@
-// Home reminders: the due dates a homeowner wants a WhatsApp nudge for. We keep
-// only the kind of bill, its date and how often it repeats: no amounts, account
-// or consumer numbers, so there is nothing sensitive to leak or misuse.
-export type ReminderKind =
-  | 'property_tax' | 'electricity' | 'society' | 'water_bill' | 'insurance'
-  | 'ac_service' | 'ro_filter' | 'pest' | 'tank' | 'warranty';
+// Home-care reminders: only the upkeep jobs a club deal can do better, so every
+// reminder leads to a club rate. Plain bill reminders (electricity, tax, society)
+// are left to payment apps. We keep only the kind, its date and how often it
+// repeats: no amounts, account or consumer numbers, so nothing sensitive to leak.
+export type ReminderKind = 'ac_service' | 'ro_filter' | 'pest' | 'tank' | 'waterproofing' | 'battery';
 
 export type Repeat = 'none' | 'monthly' | 'quarterly' | 'half-yearly' | 'yearly';
 
-export const reminderKinds: { id: ReminderKind; label: string; repeat: Repeat; dealId?: string }[] = [
-  { id: 'property_tax', label: 'Property tax', repeat: 'yearly' },
-  { id: 'electricity', label: 'Electricity bill', repeat: 'monthly' },
-  { id: 'society', label: 'Society maintenance', repeat: 'monthly' },
-  { id: 'water_bill', label: 'Water bill', repeat: 'quarterly' },
-  { id: 'insurance', label: 'Home insurance renewal', repeat: 'yearly' },
+export const reminderKinds: { id: ReminderKind; label: string; repeat: Repeat; dealId: string }[] = [
   { id: 'ac_service', label: 'AC service', repeat: 'half-yearly', dealId: 'r2-cooling' },
   { id: 'ro_filter', label: 'RO filter change', repeat: 'half-yearly', dealId: 'r4-water' },
-  { id: 'pest', label: 'Pest control', repeat: 'yearly', dealId: 'r3-pest' },
   { id: 'tank', label: 'Water tank cleaning', repeat: 'half-yearly', dealId: 'r4-water' },
-  { id: 'warranty', label: 'Warranty expiry', repeat: 'none' },
+  { id: 'pest', label: 'Pest and termite control', repeat: 'yearly', dealId: 'r3-pest' },
+  { id: 'waterproofing', label: 'Terrace leak check before the rains', repeat: 'yearly', dealId: 'r3-waterproofing' },
+  { id: 'battery', label: 'Inverter battery check', repeat: 'yearly', dealId: 'r2-backup' },
 ];
 
 export const repeatLabel: Record<Repeat, string> = {
