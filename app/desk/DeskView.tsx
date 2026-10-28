@@ -3,11 +3,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Download, Lock, LogOut, RefreshCw, Search, MessageCircle, Check } from 'lucide-react';
 import { Mark } from '@/components/Mark';
 import { inr, site } from '@/lib/config';
+import { deals, monthLabel } from '@/lib/deals';
 
 type Reg = { phone: string; name: string; area: string; home: string; interests: string[]; lang: string; source: string; status: string; paymentId: string | null; createdAt: string; paidAt: string | null };
 type CheckReq = { id: string; phone: string; name: string; building: string; area: string; purpose: string; product?: string; household?: string; moveIn: string; price: number; source: string; status: string; createdAt: string };
 type CheckAns = { id: string; phone: string; name: string; building: string; area: string; role: string; years: string; household?: string; answers: Record<string, string>; rating: number; recommend: boolean; calls?: boolean; status: string; createdAt: string };
-type Data = { registrations: Reg[]; optins: { phone: string; createdAt: string }[]; counts: { members: number; paid: number; optins: number }; round: { id: string; target: number; opens: string; closes: string }; storage: string; checkRequests?: CheckReq[]; checkAnswers?: CheckAns[] };
+type DealInt = { dealId: string; phone: string; name: string; city: string; source: string; member: boolean; createdAt: string };
+type Data = { registrations: Reg[]; optins: { phone: string; createdAt: string }[]; counts: { members: number; paid: number; optins: number }; round: { id: string; target: number; opens: string; closes: string }; storage: string; checkRequests?: CheckReq[]; checkAnswers?: CheckAns[]; dealInterests?: DealInt[] };
 
 function DeskShell({ children, onLogout }: { children: React.ReactNode; onLogout?: () => void }) {
   return (
@@ -161,6 +163,38 @@ export function DeskView() {
           </tbody>
         </table>
         {d && !rows.length && <div className="empty">No members match.</div>}
+      </div>
+
+      <div className="desk-head" style={{ marginTop: 48 }}>
+        <div><p className="overline">Free, before anyone pays</p><h1>Deal interest</h1></div>
+      </div>
+      <div className="kpis">
+        <div className="kpi"><small>People interested</small><span className="amount">{d ? new Set(d.dealInterests?.map(i => i.phone)).size : '·'}</span><small>{d ? new Set(d.dealInterests?.filter(i => !i.member).map(i => i.phone)).size : 0} not yet members</small></div>
+        <div className="kpi"><small>Deal picks</small><span className="amount">{d?.dealInterests?.length ?? '·'}</span><small>one person can pick several</small></div>
+        <div className="kpi"><small>Top source</small><span className="amount" style={{ fontSize: 20 }}>{(() => { const m = new Map<string, number>(); d?.dealInterests?.forEach(i => m.set(i.source, (m.get(i.source) || 0) + 1)); const top = [...m.entries()].sort((a, b) => b[1] - a[1])[0]; return top ? `${top[0]} (${top[1]})` : '·'; })()}</span><small>utm_source/campaign/ad</small></div>
+      </div>
+      <div className="table-wrap">
+        <table className="data">
+          <thead><tr><th>Deal</th><th>Month</th><th>Picks</th><th>Non-members</th><th>By city</th><th>By source</th></tr></thead>
+          <tbody>
+            {deals.map(dl => {
+              const list = d?.dealInterests?.filter(i => i.dealId === dl.id) ?? [];
+              const tally = (key: 'city' | 'source') => { const m = new Map<string, number>(); list.forEach(i => m.set(i[key], (m.get(i[key]) || 0) + 1)); return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${k} ${v}`).join(', '); };
+              return <tr key={dl.id}><td>{dl.title}</td><td>{monthLabel(dl.month)}</td><td>{list.length}</td><td>{list.filter(i => !i.member).length}</td><td>{tally('city')}</td><td>{tally('source')}</td></tr>;
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="table-wrap" style={{ marginTop: 16 }}>
+        <table className="data">
+          <thead><tr><th>Name</th><th>WhatsApp</th><th>City</th><th>Deal</th><th>Source</th><th>Member</th><th>When</th></tr></thead>
+          <tbody>
+            {d?.dealInterests?.map(i => (
+              <tr key={i.dealId + i.phone}><td>{i.name}</td><td className="mono">{i.phone}</td><td>{i.city}</td><td>{deals.find(x => x.id === i.dealId)?.title ?? i.dealId}</td><td>{i.source}</td><td>{i.member ? <span className="gm-badge gm-badge-verified"><Check size={14} /> Paid</span> : <span className="gm-badge gm-badge-pending">Free</span>}</td><td>{fmt(i.createdAt)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+        {d && !d.dealInterests?.length && <div className="empty">No deal interest yet.</div>}
       </div>
 
       <div className="desk-head" style={{ marginTop: 48 }}>

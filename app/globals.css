@@ -334,3 +334,15 @@ table.data .mono { font-family: var(--font-mono); font-size: 14px; }
 .answer-calls { display: block; }
 .answer-calls .check { color: var(--ink-muted); }
 .answer-calls strong { color: var(--ink); font-family: var(--font-display); font-weight: 600; }
+
+/* Deals calendar */
+.deals-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); }
+.deal-card { background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: var(--space-5); display: flex; flex-direction: column; gap: var(--space-2); transition: border-color var(--duration-base) var(--easing-standard); }
+.deal-card-on { border-color: var(--brass); }
+.deal-card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.deal-month { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--brass); }
+.deal-title { font-size: 19px; display: flex; align-items: center; gap: 8px; margin: 4px 0 0; }
+.deal-why { font-size: 15px; margin: 0; }
+.deal-brands { font-size: 13px; color: var(--ink-muted); margin: 0; flex: 1; }
+.deal-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: var(--space-2); flex-wrap: wrap; }
+.deal-link { font-family: var(--font-display); font-size: 14px; color: var(--brass); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }

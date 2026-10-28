@@ -37,6 +37,7 @@ export function Home() {
                   <a className="gm-btn gm-btn-secondary" href={waLink('Hi Gharmalak, I want to know more about the club.')} target="_blank" rel="noopener"><MessageCircle size={18} /> {t.hero_wa}</a>
                 </div>
                 <p className="hero-note"><BadgeCheck size={18} /> {t.hero_note}</p>
+                <p className="hero-note"><Link href="/deals">{t.nav_deals} →</Link></p>
               </div>
               <div className="card-stage" aria-hidden="true">
                 <MalakCard className="back" finish="titanium" still pose={BACK_POSE} name="Rahul Joshi" number="GM · 0002 · NGP" label={t.card_member} over={t.card_over} />

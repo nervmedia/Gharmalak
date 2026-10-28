@@ -18,6 +18,7 @@ export function Header() {
         </Link>
         <nav className="header-nav" aria-label="Main">
           <Link href="/#how">{t.nav_how}</Link>
+          <Link href="/deals">{t.nav_deals}</Link>
           <Link href="/round/solar-nagpur">{t.nav_round}</Link>
         </nav>
         <div className="header-actions">
