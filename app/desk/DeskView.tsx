@@ -5,7 +5,9 @@ import { Mark } from '@/components/Mark';
 import { inr, site } from '@/lib/config';
 
 type Reg = { phone: string; name: string; area: string; home: string; interests: string[]; lang: string; source: string; status: string; paymentId: string | null; createdAt: string; paidAt: string | null };
-type Data = { registrations: Reg[]; optins: { phone: string; createdAt: string }[]; counts: { members: number; paid: number; optins: number }; round: { id: string; target: number; opens: string; closes: string }; storage: string };
+type CheckReq = { id: string; phone: string; name: string; building: string; area: string; purpose: string; product?: string; household?: string; moveIn: string; price: number; source: string; status: string; createdAt: string };
+type CheckAns = { id: string; phone: string; name: string; building: string; area: string; role: string; years: string; household?: string; answers: Record<string, string>; rating: number; recommend: boolean; calls?: boolean; status: string; createdAt: string };
+type Data = { registrations: Reg[]; optins: { phone: string; createdAt: string }[]; counts: { members: number; paid: number; optins: number }; round: { id: string; target: number; opens: string; closes: string }; storage: string; checkRequests?: CheckReq[]; checkAnswers?: CheckAns[] };
 
 function DeskShell({ children, onLogout }: { children: React.ReactNode; onLogout?: () => void }) {
   return (
@@ -74,6 +76,11 @@ export function DeskView() {
     const m = new Map<string, number>();
     d?.registrations.forEach(r => m.set(r.area, (m.get(r.area) || 0) + 1));
     return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
+  }, [d]);
+  const checkCovered = useMemo(() => {
+    const m = new Map<string, number>();
+    d?.checkAnswers?.forEach(a => { const k = a.building.trim().toLowerCase(); m.set(k, (m.get(k) || 0) + 1); });
+    return [...m.values()].filter(n => n >= 3).length;
   }, [d]);
   const today = new Date().toISOString().slice(0, 10);
   const newToday = d?.registrations.filter(r => r.createdAt.slice(0, 10) === today).length ?? 0;
@@ -154,6 +161,57 @@ export function DeskView() {
           </tbody>
         </table>
         {d && !rows.length && <div className="empty">No members match.</div>}
+      </div>
+
+      <div className="desk-head" style={{ marginTop: 48 }}>
+        <div><p className="overline">Pune test</p><h1>Gharmalak Check</h1></div>
+      </div>
+      <div className="kpis">
+        <div className="kpi"><small>Report requests</small><span className="amount">{d?.checkRequests?.length ?? '·'}</span><small>{d?.checkRequests?.filter(r => r.price === 99).length ?? 0} at ₹99 · {d?.checkRequests?.filter(r => r.price === 299).length ?? 0} at ₹299 · {d?.checkRequests?.filter(r => r.product === 'call').length ?? 0} owner calls</small></div>
+        <div className="kpi"><small>Owner answers</small><span className="amount">{d?.checkAnswers?.length ?? '·'}</span><small>waiting for proof until verified</small></div>
+        <div className="kpi"><small>Buildings with 3+ answers</small><span className="amount">{d ? checkCovered : '·'}</span><small>goal 20 of 30</small></div>
+        <div className="kpi"><small>Buildings requested</small><span className="amount">{d ? new Set(d.checkRequests?.map(r => r.building.toLowerCase())).size : '·'}</span><small>unique names</small></div>
+      </div>
+      <div className="table-wrap" style={{ marginBottom: 24 }}>
+        <table className="data">
+          <thead><tr><th>Request</th><th>Renter</th><th>WhatsApp</th><th>Building</th><th>Rent or buy</th><th>Moving</th><th>Price</th><th>When</th><th></th></tr></thead>
+          <tbody>
+            {d?.checkRequests?.map(r => (
+              <tr key={r.id}>
+                <td className="mono">{r.id}</td>
+                <td>{r.name}<br /><small className="muted">{r.source}</small></td>
+                <td className="mono">{r.phone}</td>
+                <td>{r.building}<br /><small className="muted">{r.area}</small></td>
+                <td>{r.purpose === 'buy' ? 'Buy' : 'Rent'}<br /><small className="muted">{r.product === 'call' ? 'Owner call' : 'Report'} · {r.household || '–'}</small></td>
+                <td>{r.moveIn.replace('-', ' ')}</td>
+                <td>{inr(r.price)}</td>
+                <td>{fmt(r.createdAt)}</td>
+                <td><a className="gm-btn gm-btn-ghost" href={`https://wa.me/91${r.phone}?text=${encodeURIComponent(`Hi ${r.name.split(' ')[0]}, this is Gharmalak Check about ${r.building} (${r.id}).`)}`} target="_blank" rel="noopener" aria-label={`Message ${r.name}`}><MessageCircle size={16} /></a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {d && !d.checkRequests?.length && <div className="empty">No report requests yet.</div>}
+      </div>
+      <div className="table-wrap">
+        <table className="data">
+          <thead><tr><th>Answer</th><th>Owner</th><th>WhatsApp</th><th>Building</th><th>Role</th><th>Rating</th><th>Recommend</th><th>When</th></tr></thead>
+          <tbody>
+            {d?.checkAnswers?.map(a => (
+              <tr key={a.id} title={Object.entries(a.answers).map(([k, v]) => `${k}: ${v}`).join('\n')}>
+                <td className="mono">{a.id}</td>
+                <td>{a.name}<br /><small className="muted">{a.years.replace('-', ' ')} yrs</small></td>
+                <td className="mono">{a.phone}</td>
+                <td>{a.building}<br /><small className="muted">{a.area}</small></td>
+                <td>{a.role === 'owner' ? 'Owner' : 'Tenant'}<br /><small className="muted">{a.household || '–'} · {a.calls ? 'takes calls' : 'no calls'}</small></td>
+                <td>{a.rating} / 5</td>
+                <td>{a.recommend ? 'Yes' : 'No'}</td>
+                <td>{fmt(a.createdAt)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {d && !d.checkAnswers?.length && <div className="empty">No owner answers yet.</div>}
       </div>
     </DeskShell>
   );

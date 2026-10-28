@@ -7,6 +7,8 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   if (!(await isDeskUser())) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
-  const [registrations, optins, counts] = await Promise.all([db.listRegistrations(), db.listOptins(currentRound.id), db.counts(currentRound.id)]);
-  return NextResponse.json({ registrations, optins, counts, round: currentRound, storage: storageMode });
+  const [registrations, optins, counts, checkRequests, checkAnswers] = await Promise.all([
+    db.listRegistrations(), db.listOptins(currentRound.id), db.counts(currentRound.id), db.listCheckRequests(), db.listCheckAnswers(),
+  ]);
+  return NextResponse.json({ registrations, optins, counts, round: currentRound, storage: storageMode, checkRequests, checkAnswers });
 }
