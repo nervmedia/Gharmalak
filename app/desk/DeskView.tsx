@@ -4,12 +4,14 @@ import { Download, Lock, LogOut, RefreshCw, Search, MessageCircle, Check } from 
 import { Mark } from '@/components/Mark';
 import { inr, site } from '@/lib/config';
 import { deals, reachLabel, roundOf, tierLabel } from '@/lib/deals';
+import { kindLabel, nextDue, repeatLabel, type Repeat } from '@/lib/reminders';
 
 type Reg = { phone: string; name: string; area: string; home: string; interests: string[]; lang: string; source: string; status: string; paymentId: string | null; createdAt: string; paidAt: string | null };
 type CheckReq = { id: string; phone: string; name: string; building: string; area: string; purpose: string; product?: string; household?: string; moveIn: string; price: number; source: string; status: string; createdAt: string };
 type CheckAns = { id: string; phone: string; name: string; building: string; area: string; role: string; years: string; household?: string; answers: Record<string, string>; rating: number; recommend: boolean; calls?: boolean; status: string; createdAt: string };
 type DealInt = { dealId: string; phone: string; name: string; city: string; source: string; member: boolean; createdAt: string };
-type Data = { registrations: Reg[]; optins: { phone: string; createdAt: string }[]; counts: { members: number; paid: number; optins: number }; round: { id: string; target: number; opens: string; closes: string }; storage: string; checkRequests?: CheckReq[]; checkAnswers?: CheckAns[]; dealInterests?: DealInt[] };
+type Rem = { id: string; phone: string; name: string; kind: string; dueDate: string; repeat: string; remindDays: number; member: boolean; createdAt: string };
+type Data = { registrations: Reg[]; optins: { phone: string; createdAt: string }[]; counts: { members: number; paid: number; optins: number }; round: { id: string; target: number; opens: string; closes: string }; storage: string; checkRequests?: CheckReq[]; checkAnswers?: CheckAns[]; dealInterests?: DealInt[]; reminders?: Rem[] };
 
 function DeskShell({ children, onLogout }: { children: React.ReactNode; onLogout?: () => void }) {
   return (
@@ -196,6 +198,43 @@ export function DeskView() {
         </table>
         {d && !d.dealInterests?.length && <div className="empty">No deal interest yet.</div>}
       </div>
+
+      <div className="desk-head" style={{ marginTop: 48 }}>
+        <div><p className="overline">My home</p><h1>Reminders</h1></div>
+      </div>
+      {(() => {
+        const today = new Date().toISOString().slice(0, 10);
+        const soon = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
+        const rows = (d?.reminders ?? []).map(r => {
+          const due = nextDue(r.dueDate, r.repeat as Repeat, today);
+          const send = due ? new Date(new Date(due + 'T00:00:00Z').getTime() - r.remindDays * 864e5).toISOString().slice(0, 10) : null;
+          return { ...r, due, send };
+        }).filter(r => r.due).sort((a, b) => a.send!.localeCompare(b.send!));
+        const dueSoon = rows.filter(r => r.send! <= soon);
+        const msg = (r: typeof rows[number]) => `Hi ${r.name}, a reminder from Gharmalak: your ${kindLabel(r.kind).toLowerCase()} is due on ${new Date(r.due + 'T00:00:00Z').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', timeZone: 'UTC' })}. Reply STOP to stop reminders.`;
+        return (
+          <>
+            <div className="kpis">
+              <div className="kpi"><small>Homes using reminders</small><span className="amount">{d ? new Set(d.reminders?.map(r => r.phone)).size : '·'}</span><small>{d ? new Set(d.reminders?.filter(r => !r.member).map(r => r.phone)).size : 0} not yet members</small></div>
+              <div className="kpi"><small>Reminders saved</small><span className="amount">{d?.reminders?.length ?? '·'}</span><small>dates only, no amounts or account numbers</small></div>
+              <div className="kpi"><small>To send in 14 days</small><span className="amount">{d ? dueSoon.length : '·'}</span><small>tap a row to WhatsApp it</small></div>
+            </div>
+            <div className="table-wrap">
+              <table className="data">
+                <thead><tr><th>Send on</th><th>Name</th><th>WhatsApp</th><th>Reminder</th><th>Due</th><th>Repeats</th><th>Member</th><th></th></tr></thead>
+                <tbody>
+                  {rows.map(r => (
+                    <tr key={r.id}><td>{r.send}</td><td>{r.name}</td><td className="mono">{r.phone}</td><td>{kindLabel(r.kind)}</td><td>{r.due}</td><td>{repeatLabel[r.repeat as Repeat] ?? r.repeat}</td>
+                      <td>{r.member ? <span className="gm-badge gm-badge-verified"><Check size={14} /> Paid</span> : <span className="gm-badge gm-badge-pending">Free</span>}</td>
+                      <td><a className="deal-link" href={`https://wa.me/91${r.phone}?text=${encodeURIComponent(msg(r))}`} target="_blank" rel="noopener">WhatsApp</a></td></tr>
+                  ))}
+                </tbody>
+              </table>
+              {d && !rows.length && <div className="empty">No reminders yet.</div>}
+            </div>
+          </>
+        );
+      })()}
 
       <div className="desk-head" style={{ marginTop: 48 }}>
         <div><p className="overline">Pune test</p><h1>Gharmalak Check</h1></div>

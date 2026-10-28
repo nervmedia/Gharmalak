@@ -20,6 +20,7 @@ export type Optin = { roundId: string; phone: string; createdAt: string };
 
 // Free interest in an upcoming deal (no membership needed)
 export type DealInterest = { dealId: string; phone: string; name: string; city: string; source: string; member: boolean; createdAt: string };
+export type HomeReminder = { id: string; phone: string; name: string; kind: string; dueDate: string; repeat: string; remindDays: number; member: boolean; tokenHash: string; createdAt: string };
 
 // Gharmalak Check (Pune test)
 export type CheckRequest = {
@@ -69,6 +70,9 @@ type Store = {
   listCheckAnswers(): Promise<CheckAnswer[]>;
   addDealInterest(i: DealInterest): Promise<{ created: boolean }>;
   listDealInterests(): Promise<DealInterest[]>;
+  addReminder(r: HomeReminder): Promise<void>;
+  deleteReminder(id: string, tokenHash: string): Promise<boolean>;
+  listReminders(): Promise<HomeReminder[]>;
 };
 
 const useMysql = Boolean(process.env.DB_NAME && process.env.DB_USER);
@@ -148,6 +152,19 @@ async function pool() {
         member TINYINT NOT NULL DEFAULT 0,
         created_at DATETIME NOT NULL,
         PRIMARY KEY (deal_id, phone)
+      ) CHARACTER SET utf8mb4`);
+      await p.query(`CREATE TABLE IF NOT EXISTS home_reminders (
+        id VARCHAR(24) PRIMARY KEY,
+        phone VARCHAR(10) NOT NULL,
+        name VARCHAR(120) NOT NULL,
+        kind VARCHAR(24) NOT NULL,
+        due_date DATE NOT NULL,
+        repeat_every VARCHAR(12) NOT NULL,
+        remind_days TINYINT NOT NULL,
+        member TINYINT NOT NULL DEFAULT 0,
+        token_hash CHAR(64) NOT NULL,
+        created_at DATETIME NOT NULL,
+        INDEX (phone)
       ) CHARACTER SET utf8mb4`);
       return p;
     })();
@@ -272,11 +289,31 @@ const mysqlStore: Store = {
       member: Number(r.member) === 1, createdAt: fromSql(r.created_at as Date) as string,
     }));
   },
+  async addReminder(r) {
+    const p = await pool();
+    await p.query(
+      'INSERT INTO home_reminders (id,phone,name,kind,due_date,repeat_every,remind_days,member,token_hash,created_at) VALUES (?,?,?,?,?,?,?,?,?,?)',
+      [r.id, r.phone, r.name, r.kind, r.dueDate, r.repeat, r.remindDays, r.member ? 1 : 0, r.tokenHash, toSql(r.createdAt)],
+    );
+  },
+  async deleteReminder(id, tokenHash) {
+    const p = await pool();
+    const [res] = await p.query('DELETE FROM home_reminders WHERE id = ? AND token_hash = ?', [id, tokenHash]);
+    return (res as { affectedRows: number }).affectedRows === 1;
+  },
+  async listReminders() {
+    const p = await pool();
+    const [rows] = await p.query("SELECT *, DATE_FORMAT(due_date, '%Y-%m-%d') AS due FROM home_reminders ORDER BY created_at DESC");
+    return (rows as Record<string, unknown>[]).map(r => ({
+      id: String(r.id), phone: String(r.phone), name: String(r.name), kind: String(r.kind), dueDate: String(r.due), repeat: String(r.repeat_every),
+      remindDays: Number(r.remind_days), member: Number(r.member) === 1, tokenHash: String(r.token_hash), createdAt: fromSql(r.created_at as Date) as string,
+    }));
+  },
 };
 
 /* ---------- JSON file (local testing only) ---------- */
 const file = path.join(process.cwd(), 'data', 'store.json');
-type FileData = { registrations: Registration[]; optins: Optin[]; checkRequests?: CheckRequest[]; checkAnswers?: CheckAnswer[]; dealInterests?: DealInterest[] };
+type FileData = { registrations: Registration[]; optins: Optin[]; checkRequests?: CheckRequest[]; checkAnswers?: CheckAnswer[]; dealInterests?: DealInterest[]; reminders?: HomeReminder[] };
 let queue: Promise<unknown> = Promise.resolve();
 
 async function readFile(): Promise<FileData> {
@@ -327,6 +364,14 @@ const fileStore: Store = {
     list.push(i); return { created: true };
   }, true),
   listDealInterests: () => withFile(d => [...(d.dealInterests ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt))),
+  addReminder: r => withFile(d => { (d.reminders ??= []).push(r); }, true),
+  deleteReminder: (id, tokenHash) => withFile(d => {
+    const list = d.reminders ?? [];
+    const i = list.findIndex(x => x.id === id && x.tokenHash === tokenHash);
+    if (i < 0) return false;
+    list.splice(i, 1); return true;
+  }, true),
+  listReminders: () => withFile(d => [...(d.reminders ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt))),
 };
 
 export const db: Store = useMysql ? mysqlStore : fileStore;
