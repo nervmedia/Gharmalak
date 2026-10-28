@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { AlertCircle, ArrowRight, BatteryCharging, Bug, Check, Droplets, Flame, Paintbrush, ShieldCheck, Snowflake, Sun, Umbrella } from 'lucide-react';
-import { deals, dealCities, monthLabel, type DealKind } from '@/lib/deals';
+import { AlertCircle, AppWindow, ArrowRight, Bath, BatteryCharging, Blinds, Bug, Cctv, Check, ChefHat, CloudRain, CookingPot, Droplets, Fan, Flame, Layers, Paintbrush, Refrigerator, ShieldCheck, Snowflake, Sofa, Sun, Umbrella } from 'lucide-react';
+import { deals, dealCities, dealMonths, monthLabel, tierLabel, type Deal, type DealKind } from '@/lib/deals';
 import { currentRound, inr, site } from '@/lib/config';
 
 const ICONS: Record<DealKind, typeof Sun> = {
   solar: Sun, heater: Flame, painting: Paintbrush, cooling: Snowflake, backup: BatteryCharging, waterproofing: Umbrella, pest: Bug, water: Droplets,
+  security: Cctv, kitchen: ChefHat, fans: Fan, appliances: CookingPot, coolroof: Layers, rainwater: CloudRain, windows: AppWindow,
+  bathroom: Bath, furniture: Sofa, decor: Blinds, whitegoods: Refrigerator,
 };
 
 function sourceFromUrl() {
@@ -71,38 +73,24 @@ export function DealsView() {
         <div className="wrap">
           <p className="overline">Free to browse · No payment to show interest</p>
           <h1>Every deal for the <em>next 12 months.</em></h1>
-          <p className="hero-body">One group round a month, timed to the weather: solar before summer, waterproofing before the monsoon, painting before Diwali. Tap the deals you want. We&apos;ll WhatsApp you when each round opens, with the price to beat.</p>
+          <p className="hero-body">Two group deals every month: a big one, where the group price saves you the most, and a quick win. Timed to the weather: solar before summer, waterproofing before the monsoon, painting before Diwali. Tap the deals you want. We&apos;ll WhatsApp you when each round opens, with the price to beat.</p>
           <p className="hero-note"><ShieldCheck size={18} /> Only top-rated, brand-certified installers. Members get the group price; browsing and showing interest are free.</p>
         </div>
       </section>
 
       <section className="section" style={{ paddingTop: 0, borderTop: 0 }}>
         <div className="wrap">
-          <ol className="deals-grid" aria-label="Deals by month">
-            {deals.map(d => {
-              const Icon = ICONS[d.kind];
-              const on = picked.includes(d.id);
-              const live = d.roundHref && d.id.includes(currentRound.category) && d.month === currentRound.opens.slice(0, 7);
-              return (
-                <li key={d.id} className={`deal-card ${on ? 'deal-card-on' : ''}`}>
-                  <div className="deal-card-top">
-                    <span className="deal-month">{monthLabel(d.month)}</span>
-                    {live && <span className="gm-badge gm-badge-founding">Round 1 · opens {new Date(currentRound.opens).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
-                  </div>
-                  <h2 className="deal-title"><Icon size={20} /> {d.title}</h2>
-                  <p className="muted deal-why">{d.why}</p>
-                  <p className="deal-brands">{d.brands}</p>
-                  <div className="deal-actions">
-                    <button type="button" className="gm-chip" aria-pressed={on} onClick={() => toggle(d.id)}>
-                      {on ? <><Check size={16} /> Interested</> : "I'm interested"}
-                    </button>
-                    {live && <Link href={d.roundHref!} className="deal-link">See the round <ArrowRight size={14} /></Link>}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-          <p className="muted" style={{ marginTop: 16, fontSize: 14 }}>Dates are for Nagpur. Other cities follow as they open; pick your city below so we know where to go next. Brand names show the kind of installer we work with, not a signed partnership.</p>
+          <div className="deal-months">
+            {dealMonths.map(m => (
+              <section key={m} className="deal-month-row" aria-label={monthLabel(m)}>
+                <h2 className="deal-month">{monthLabel(m)}</h2>
+                <ol className="deals-grid deals-pair">
+                  {deals.filter(d => d.month === m).map(d => <DealCard key={d.id} d={d} on={picked.includes(d.id)} onToggle={() => toggle(d.id)} />)}
+                </ol>
+              </section>
+            ))}
+          </div>
+          <p className="muted" style={{ marginTop: 16, fontSize: 14 }}>Dates are for Nagpur. Other cities follow as they open; pick your city below so we know where to go next. Prices are typical spends per home, not quotes. Brand names show the kind of vendor we work with, not a signed partnership.</p>
         </div>
       </section>
 
@@ -157,5 +145,28 @@ export function DealsView() {
         </div>
       </section>
     </>
+  );
+}
+
+function DealCard({ d, on, onToggle }: { d: Deal; on: boolean; onToggle: () => void }) {
+  const Icon = ICONS[d.kind];
+  const live = d.roundHref && d.id.includes(currentRound.category) && d.month === currentRound.opens.slice(0, 7);
+  return (
+    <li className={`deal-card ${d.tier === 'big' ? 'deal-card-big' : ''} ${on ? 'deal-card-on' : ''}`}>
+      <div className="deal-card-top">
+        <span className={`deal-tier deal-tier-${d.tier}`}>{tierLabel[d.tier]}</span>
+        {live && <span className="gm-badge gm-badge-founding">Round 1 · opens {new Date(currentRound.opens).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>}
+      </div>
+      <h3 className="deal-title"><Icon size={20} /> {d.title}</h3>
+      <p className="deal-ticket">{d.ticket}</p>
+      <p className="muted deal-why">{d.why}</p>
+      <p className="deal-brands">{d.brands}</p>
+      <div className="deal-actions">
+        <button type="button" className="gm-chip" aria-pressed={on} onClick={onToggle}>
+          {on ? <><Check size={16} /> Interested</> : "I'm interested"}
+        </button>
+        {live && <Link href={d.roundHref!} className="deal-link">See the round <ArrowRight size={14} /></Link>}
+      </div>
+    </li>
   );
 }
