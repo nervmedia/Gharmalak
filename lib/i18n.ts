@@ -9,6 +9,7 @@ export const langs: { id: Lang; label: string }[] = [
 const en = {
   nav_how: 'How it works',
   nav_round: 'Solar round',
+  nav_deals: '12-month deals',
   nav_join: 'Join the club',
   descriptor: "HOMEOWNERS' CLUB",
   hero_over: 'Nagpur · Founding members',
@@ -134,6 +135,7 @@ const mr: Dict = {
   ...en,
   nav_how: 'हे कसे चालते',
   nav_round: 'सोलर राउंड',
+  nav_deals: '१२ महिन्यांचे डील्स',
   nav_join: 'क्लबमध्ये सामील व्हा',
   hero_over: 'नागपूर · संस्थापक सदस्य',
   hero_title: 'एकत्र खरेदी, म्हणून तुमच्या घरासाठी चांगली किंमत.',
@@ -253,6 +255,7 @@ const hi: Dict = {
   ...en,
   nav_how: 'यह कैसे काम करता है',
   nav_round: 'सोलर राउंड',
+  nav_deals: '12 महीनों की डील्स',
   nav_join: 'क्लब से जुड़ें',
   hero_over: 'नागपुर · संस्थापक सदस्य',
   hero_title: 'साथ मिलकर खरीदें, घर के लिए बेहतर दाम पाएँ।',

@@ -18,6 +18,9 @@ export type Registration = {
 
 export type Optin = { roundId: string; phone: string; createdAt: string };
 
+// Free interest in an upcoming deal (no membership needed)
+export type DealInterest = { dealId: string; phone: string; name: string; city: string; source: string; member: boolean; createdAt: string };
+
 // Gharmalak Check (Pune test)
 export type CheckRequest = {
   id: string;
@@ -64,6 +67,8 @@ type Store = {
   listCheckRequests(): Promise<CheckRequest[]>;
   addCheckAnswer(a: CheckAnswer): Promise<void>;
   listCheckAnswers(): Promise<CheckAnswer[]>;
+  addDealInterest(i: DealInterest): Promise<{ created: boolean }>;
+  listDealInterests(): Promise<DealInterest[]>;
 };
 
 const useMysql = Boolean(process.env.DB_NAME && process.env.DB_USER);
@@ -133,6 +138,16 @@ async function pool() {
         calls TINYINT NOT NULL DEFAULT 0,
         status VARCHAR(20) NOT NULL DEFAULT 'pending',
         created_at DATETIME NOT NULL
+      ) CHARACTER SET utf8mb4`);
+      await p.query(`CREATE TABLE IF NOT EXISTS deal_interests (
+        deal_id VARCHAR(40) NOT NULL,
+        phone VARCHAR(10) NOT NULL,
+        name VARCHAR(120) NOT NULL,
+        city VARCHAR(40) NOT NULL,
+        source VARCHAR(120) NOT NULL,
+        member TINYINT NOT NULL DEFAULT 0,
+        created_at DATETIME NOT NULL,
+        PRIMARY KEY (deal_id, phone)
       ) CHARACTER SET utf8mb4`);
       return p;
     })();
@@ -241,11 +256,27 @@ const mysqlStore: Store = {
       createdAt: fromSql(r.created_at as Date) as string,
     }));
   },
+  async addDealInterest(i) {
+    const p = await pool();
+    const [res] = await p.query(
+      'INSERT IGNORE INTO deal_interests (deal_id,phone,name,city,source,member,created_at) VALUES (?,?,?,?,?,?,?)',
+      [i.dealId, i.phone, i.name, i.city, i.source, i.member ? 1 : 0, toSql(i.createdAt)],
+    );
+    return { created: (res as { affectedRows: number }).affectedRows === 1 };
+  },
+  async listDealInterests() {
+    const p = await pool();
+    const [rows] = await p.query('SELECT * FROM deal_interests ORDER BY created_at DESC');
+    return (rows as Record<string, unknown>[]).map(r => ({
+      dealId: String(r.deal_id), phone: String(r.phone), name: String(r.name), city: String(r.city), source: String(r.source),
+      member: Number(r.member) === 1, createdAt: fromSql(r.created_at as Date) as string,
+    }));
+  },
 };
 
 /* ---------- JSON file (local testing only) ---------- */
 const file = path.join(process.cwd(), 'data', 'store.json');
-type FileData = { registrations: Registration[]; optins: Optin[]; checkRequests?: CheckRequest[]; checkAnswers?: CheckAnswer[] };
+type FileData = { registrations: Registration[]; optins: Optin[]; checkRequests?: CheckRequest[]; checkAnswers?: CheckAnswer[]; dealInterests?: DealInterest[] };
 let queue: Promise<unknown> = Promise.resolve();
 
 async function readFile(): Promise<FileData> {
@@ -290,6 +321,12 @@ const fileStore: Store = {
   listCheckRequests: () => withFile(d => [...(d.checkRequests ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt))),
   addCheckAnswer: a => withFile(d => { (d.checkAnswers ??= []).push(a); }, true),
   listCheckAnswers: () => withFile(d => [...(d.checkAnswers ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt))),
+  addDealInterest: i => withFile(d => {
+    const list = (d.dealInterests ??= []);
+    if (list.some(x => x.dealId === i.dealId && x.phone === i.phone)) return { created: false };
+    list.push(i); return { created: true };
+  }, true),
+  listDealInterests: () => withFile(d => [...(d.dealInterests ?? [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt))),
 };
 
 export const db: Store = useMysql ? mysqlStore : fileStore;
