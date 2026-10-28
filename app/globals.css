@@ -347,6 +347,15 @@ table.data .mono { font-family: var(--font-mono); font-size: 14px; }
 .deal-card-big { background: linear-gradient(180deg, color-mix(in srgb, var(--brass) 8%, var(--surface-raised)), var(--surface-raised)); }
 .deal-tier { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-muted); }
 .deal-tier-big { border-color: var(--brass); color: var(--brass); }
+.city-bar { display: flex; flex-direction: column; gap: var(--space-3); margin-bottom: var(--space-6); }
+.city-bar-head { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-3); flex-wrap: wrap; }
+.city-bar-head h2 { margin: 4px 0 0; }
+.city-select { appearance: none; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.city-select option { color: #111; }
+.city-select-on { border-color: var(--brass); color: var(--brass); }
+.round-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.round-optin { margin: -4px 0 0; font-size: 14px; }
+.monsoon-note { display: flex; align-items: center; gap: 8px; margin: 0 0 var(--space-3); padding: var(--space-3) var(--space-4); border: 1px dashed var(--line); border-radius: var(--radius-lg); color: var(--ink-muted); font-size: 14px; }
 .deal-ticket { font-family: var(--font-display); font-size: 15px; margin: 0; color: var(--ink); }
 .deal-title { font-size: 19px; display: flex; align-items: center; gap: 8px; margin: 4px 0 0; }
 .deal-why { font-size: 15px; margin: 0; }

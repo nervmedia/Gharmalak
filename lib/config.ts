@@ -24,8 +24,8 @@ export const currentRound: Round = {
   slug: 'solar-nagpur',
   category: 'solar',
   city: 'Nagpur',
-  opens: '2026-11-18',
-  closes: '2026-12-05',
+  opens: '2026-11-01', // opt-ins open; installation in January–February 2027
+  closes: '2026-12-31',
   target: 50,
   minSaving: 10,
 };

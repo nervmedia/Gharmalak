@@ -46,7 +46,7 @@ export function Home() {
                   <div className="gm-alert-badge"><MessageCircle size={18} /></div>
                   <div className="gm-alert-body">
                     <p className="gm-alert-from">Gharmalak <span>{t.example}</span></p>
-                    <p className="gm-alert-text">Round 1: rooftop solar opens 18 Nov.{'\n'}Reply YES to opt in.</p>
+                    <p className="gm-alert-text">Round 1: rooftop solar, installed in January. Opt in from 1 Nov.{'\n'}Reply YES.</p>
                   </div>
                 </div>
               </div>
