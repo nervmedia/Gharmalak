@@ -150,3 +150,25 @@
   .hx-pill span { display: none; }
   .hx-stat-big { font-size: 40px; }
 }
+
+/* Deep green (#006039 family) to bring the page to life; brass stays for buttons and numbers. */
+.hx { --hx-green: #006039; --hx-green-deep: #013d26; --hx-green-ink: #0a1f17; --hx-green-line: rgba(0,140,84,0.35); --hx-green-soft: rgba(0,96,57,0.22); }
+.hx .hx-hero::before { background: linear-gradient(90deg, rgba(11,12,14,0.94) 0%, rgba(4,30,20,0.84) 50%, rgba(0,72,43,0.5) 100%), radial-gradient(60% 80% at 80% 30%, rgba(207,174,106,0.16), transparent 70%); }
+.hx .hx-tint { background: radial-gradient(70% 90% at 0% 0%, rgba(0,96,57,0.20), transparent 60%), var(--hx-green-ink); border-color: var(--hx-green-line); }
+.hx .hx-icon-tile { background: var(--hx-green-soft); border-color: var(--hx-green-line); }
+.hx .hx-stat-card { border-color: var(--hx-green-line); background: linear-gradient(160deg, rgba(0,96,57,0.28), var(--surface-raised) 55%); }
+.hx .hx-step:hover, .hx .hx-deal:hover, .hx .hx-pill:hover { border-color: #1f8a5c; }
+.hx .hx-step-arrow { color: #3fbf86; border-color: var(--hx-green-line); }
+.hx .gm-progress > span { background: linear-gradient(90deg, var(--hx-green), #2fa06c); }
+.hx .hx-facts { background: linear-gradient(160deg, rgba(0,96,57,0.22), var(--surface-sunken) 70%); border-color: var(--hx-green-line); }
+.hx .hx-col:nth-child(3n+2) { background: linear-gradient(180deg, rgba(0,96,57,0.30), var(--surface-raised) 60%); border-color: var(--hx-green-line); }
+.hx .hx-col:nth-child(3n+2) header { background: rgba(0,96,57,0.30); }
+.hx .hx-who-card { border-color: var(--hx-green-line); }
+.hx .hx-promise { background: radial-gradient(60% 120% at 15% 0%, rgba(207,174,106,0.14), transparent 60%), linear-gradient(135deg, var(--hx-green-deep) 0%, var(--hx-green) 55%, #00472a 100%); border-top: 0; }
+.hx .hx-promise-grid { border-top-color: rgba(246,241,231,0.18); }
+.hx .hx-promise-grid p { color: #cfe3d8; }
+.hx .hx-promise .hx-icon-tile { background: rgba(11,12,14,0.25); border-color: rgba(207,174,106,0.45); }
+.hx .hx-end { border-color: var(--hx-green-line); background: radial-gradient(80% 120% at 100% 0%, rgba(207,174,106,0.18), transparent 60%), linear-gradient(135deg, var(--hx-green-deep), var(--hx-green)); }
+.hx .hx-end .gm-btn-secondary { border-color: rgba(246,241,231,0.4); color: var(--color-ivory-100); }
+.hx .hx-price { border-color: var(--hx-green-line); }
+.hx .plan-save { color: #3fbf86; }
