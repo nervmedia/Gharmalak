@@ -10,7 +10,7 @@ import { useLang } from './LangProvider';
 import { useStats } from './useStats';
 import { CountUp, useReveal } from './Motion';
 import { currentRound, inr, site, waLink } from '@/lib/config';
-import { deals, launchCities, roundOf } from '@/lib/deals';
+import { deals, roundOf, solarCities } from '@/lib/deals';
 
 const BACK_POSE = { rx: 9, ry: -16, gx: 70, gy: 30 };
 
@@ -66,7 +66,7 @@ export function Home() {
               <div className="counter" role="listitem" data-reveal><span className="counter-num amount">{stats ? <CountUp to={stats.members} /> : '·'}</span><span>{t.stat_members}</span></div>
               <div className="counter" role="listitem" data-reveal style={{ '--d': 1 } as React.CSSProperties}><span className="counter-num amount">{stats ? <CountUp to={stats.optins} /> : '·'}</span><span>{t.stat_optins}</span></div>
               <div className="counter" role="listitem" data-reveal style={{ '--d': 2 } as React.CSSProperties}><span className="counter-num amount"><CountUp to={10} suffix="%" /></span><span>{t.stat_saving}</span></div>
-              <div className="counter" role="listitem" data-reveal style={{ '--d': 3 } as React.CSSProperties}><span className="counter-num amount"><CountUp to={launchCities.length} /></span><span>{t.stat_cities}</span></div>
+              <div className="counter" role="listitem" data-reveal style={{ '--d': 3 } as React.CSSProperties}><span className="counter-num amount"><CountUp to={solarCities.length} /></span><span>{t.stat_cities}</span></div>
             </div>
           </div>
         </section>

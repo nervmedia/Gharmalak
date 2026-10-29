@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AlertCircle, AppWindow, ArrowRight, Bath, BatteryCharging, Blinds, Bug, Cctv, Check, ChefHat, CloudRain, CookingPot, Droplets, Fan, Flame, Layers, LocateFixed, Paintbrush, Refrigerator, ShieldCheck, Snowflake, Sofa, Sun, Umbrella } from 'lucide-react';
-import { dateLabel, dealRunsIn, deals, launchCities, laterCities, nearestCity, rounds, tierLabel, type Deal, type DealKind } from '@/lib/deals';
+import { cityGroups, dateLabel, dealRunsIn, deals, nearestCity, quickCities, solarCities, solarOnlyCities, rounds, tierLabel, type Deal, type DealKind } from '@/lib/deals';
 import { inr, site } from '@/lib/config';
 
 const ICONS: Record<DealKind, typeof Sun> = {
@@ -67,7 +67,7 @@ export function DealsView() {
     );
   }
 
-  const inLaunch = viewCity ? launchCities.includes(viewCity) : true;
+  const inLaunch = viewCity ? solarCities.includes(viewCity) : true;
   const shown = viewCity && inLaunch ? deals.filter(d => dealRunsIn(d, viewCity)) : deals;
   const hiddenCount = deals.length - shown.length;
 
@@ -126,14 +126,11 @@ export function DealsView() {
             </div>
             {locNote && <p className="muted" role="status" style={{ margin: 0 }}>{locNote}</p>}
             <div className="gm-chips">
-              {launchCities.map(c => <button key={c} type="button" className="gm-chip" aria-pressed={viewCity === c} onClick={() => chooseCity(c)}>{c}</button>)}
-              <select className={`gm-chip city-select ${viewCity && !inLaunch ? 'city-select-on' : ''}`} aria-label="Another city" value={viewCity && !inLaunch ? viewCity : ''} onChange={e => e.target.value && chooseCity(e.target.value)}>
-                <option value="">Another city…</option>
-                {[...laterCities, 'Other'].map(c => <option key={c} value={c}>{c === 'Other' ? 'Somewhere else' : c}</option>)}
-              </select>
+              {quickCities.map(c => <button key={c} type="button" className="gm-chip" aria-pressed={viewCity === c} onClick={() => chooseCity(c)}>{c}</button>)}
+              <CitySelect value={viewCity && !quickCities.includes(viewCity) ? viewCity : ''} onPick={chooseCity} />
             </div>
-            {viewCity && !inLaunch && <p className="muted" style={{ margin: 0 }}>We start in Maharashtra cities on MSEDCL power, where one solar installer can cover them all: {launchCities.join(', ')}. Tap the deals you would want anyway; we count {viewCity === 'Other' ? 'each city' : `${viewCity}`}&apos;s interest to decide where we go next.</p>}
-            {viewCity && inLaunch && hiddenCount > 0 && <p className="muted" style={{ margin: 0 }}>{hiddenCount} more deals need a local crew and start in Nagpur first.</p>}
+            {viewCity && !inLaunch && <p className="muted" style={{ margin: 0 }}>We start in {solarCities.length} cities: every Maharashtra district city on MSEDCL power, where one solar installer can cover them all, plus rooftop solar in 7 Gujarat cities. Tap the deals you would want anyway; we count {viewCity === 'Other' ? 'each city' : `${viewCity}`}&apos;s interest to decide where we go next.</p>}
+            {viewCity && inLaunch && hiddenCount > 0 && <p className="muted" style={{ margin: 0 }}>{solarOnlyCities.includes(viewCity) ? `${viewCity} starts with rooftop solar; ${hiddenCount} more deals start in Maharashtra first.` : `${hiddenCount} more deals need a local crew and start in Nagpur first.`}</p>}
             <p className="muted" style={{ margin: 0, fontSize: 13 }}>Your location stays on your phone. We only use it to pick your city.</p>
           </div>
 
@@ -197,11 +194,8 @@ export function DealsView() {
               <fieldset className="gm-field plain-fieldset">
                 <legend className="gm-label">City</legend>
                 <div className="gm-chips">
-                  {launchCities.map(c => <button key={c} type="button" className="gm-chip" aria-pressed={city === c} onClick={() => setCity(c)}>{c}</button>)}
-                  <select className={`gm-chip city-select ${launchCities.includes(city) ? '' : 'city-select-on'}`} aria-label="Another city" value={launchCities.includes(city) ? '' : city} onChange={e => e.target.value && setCity(e.target.value)}>
-                    <option value="">Another city…</option>
-                    {[...laterCities, 'Other'].map(c => <option key={c} value={c}>{c === 'Other' ? 'Somewhere else' : c}</option>)}
-                  </select>
+                  {quickCities.map(c => <button key={c} type="button" className="gm-chip" aria-pressed={city === c} onClick={() => setCity(c)}>{c}</button>)}
+                  <CitySelect value={city && !quickCities.includes(city) ? city : ''} onPick={setCity} />
                 </div>
               </fieldset>
               <label className="check">
@@ -239,5 +233,19 @@ function DealCard({ d, on, onToggle }: { d: Deal; on: boolean; onToggle: () => v
         {live && <Link href={d.roundHref!} className="deal-link">See the round <ArrowRight size={14} /></Link>}
       </div>
     </li>
+  );
+}
+
+function CitySelect({ value, onPick }: { value: string; onPick: (c: string) => void }) {
+  return (
+    <select className={`gm-chip city-select ${value ? 'city-select-on' : ''}`} aria-label="Pick your city" value={value} onChange={e => e.target.value && onPick(e.target.value)}>
+      <option value="">All cities…</option>
+      {cityGroups.map(g => (
+        <optgroup key={g.label} label={g.label}>
+          {g.cities.map(c => <option key={c} value={c}>{c}</option>)}
+        </optgroup>
+      ))}
+      <option value="Other">Somewhere else</option>
+    </select>
   );
 }
