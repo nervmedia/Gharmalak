@@ -1,8 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
-  ArrowRight, BadgeCheck, Calendar, Check, ChevronDown, ClipboardList, IndianRupee, MessageCircle, Percent,
+  ArrowLeft, ArrowRight, BadgeCheck, Calendar, Check, ChevronDown, ClipboardList, IndianRupee, MessageCircle, Percent,
   PlayCircle, ShieldCheck, Sun, Users, Wrench, BadgePercent,
 } from 'lucide-react';
 import { Header } from './Header';
@@ -14,7 +14,7 @@ import { useLang } from './LangProvider';
 import { useStats } from './useStats';
 import { CountUp, useReveal } from './Motion';
 import { currentRound, inr, site, waLink } from '@/lib/config';
-import { deals, rounds, solarCities, type DealKind } from '@/lib/deals';
+import { dateLabel, deals, rounds, solarCities, type DealKind } from '@/lib/deals';
 
 // Photo for each kind of deal, from public/images.
 const dealImage: Record<DealKind, string> = {
@@ -32,13 +32,13 @@ export function Home() {
   const stats = useStats();
   useReveal();
   const [roundTab, setRoundTab] = useState(0);
+  const shownRounds = roundTab ? rounds.filter(r => r.n === roundTab) : rounds;
   const optins = stats?.optins ?? 0;
   const pct = Math.min(100, Math.round((optins / currentRound.target) * 100));
   const seatsTaken = Math.min(site.foundingSeats, stats?.members ?? 0);
   const seatsPct = Math.round((seatsTaken / site.foundingSeats) * 100);
   const seatsLabel = t.plan_seats.replace('{n}', (site.foundingSeats - seatsTaken).toLocaleString('en-IN'));
   const closes = new Date(currentRound.closes).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-  const shownRounds = roundTab ? rounds.filter(r => r.n === roundTab) : rounds;
   const solarDeal = deals.find(x => x.kind === 'solar')!;
 
   return (
@@ -151,7 +151,7 @@ export function Home() {
           </div>
         </section>
 
-        {/* The year ahead: every round as a column of deals, with tabs */}
+        {/* The year ahead: on phones a sliding row of rounds that open; on wider screens tabs and columns */}
         <section className="hx-section">
           <div className="wrap">
             <div className="hx-head-row">
@@ -161,31 +161,34 @@ export function Home() {
               </div>
               <Link href="/deals" className="hx-pill" data-reveal style={d(2)}>{t.ahead_cta} <ArrowRight size={16} /></Link>
             </div>
-            <div className="hx-tabs" role="tablist" aria-label={t.ahead_title}>
-              <button role="tab" aria-selected={roundTab === 0} onClick={() => setRoundTab(0)}>{t.hx_all.replace('{n}', String(deals.length))}</button>
-              {rounds.map(r => (
-                <button key={r.n} role="tab" aria-selected={roundTab === r.n} onClick={() => setRoundTab(r.n)}>{t.hx_round.replace('{n}', String(r.n))}</button>
-              ))}
-            </div>
-            <div className="hx-rounds">
-              {shownRounds.map(r => {
-                const list = deals.filter(x => x.round === r.n);
-                return (
-                  <section key={r.n} className="hx-col" aria-label={`${t.hx_round.replace('{n}', String(r.n))}, ${r.install}`}>
-                    <header><span>{t.hx_round.replace('{n}', String(r.n))} · {r.install}</span><small>{t.hx_count.replace('{n}', String(list.length))}</small></header>
-                    <ul>
-                      {list.map(x => (
-                        <li key={x.id}>
-                          <Link href={`/deals?deal=${x.id}`} className="hx-deal">
-                            <img src={img(dealImage[x.kind])} alt="" loading="lazy" />
-                            <span><b>{x.title}</b><small>{x.ticket}</small></span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                );
-              })}
+            <div className="hx-only-phone"><RoundScroller /></div>
+            <div className="hx-only-wide">
+              <div className="hx-tabs" role="tablist" aria-label={t.ahead_title}>
+                <button role="tab" aria-selected={roundTab === 0} onClick={() => setRoundTab(0)}>{t.hx_all.replace('{n}', String(deals.length))}</button>
+                {rounds.map(r => (
+                  <button key={r.n} role="tab" aria-selected={roundTab === r.n} onClick={() => setRoundTab(r.n)}>{t.hx_round.replace('{n}', String(r.n))}</button>
+                ))}
+              </div>
+              <div className="hx-rounds">
+                {shownRounds.map(r => {
+                  const list = deals.filter(x => x.round === r.n);
+                  return (
+                    <section key={r.n} className="hx-col" aria-label={`${t.hx_round.replace('{n}', String(r.n))}, ${r.install}`}>
+                      <header><span>{t.hx_round.replace('{n}', String(r.n))} · {r.install}</span><small>{t.hx_count.replace('{n}', String(list.length))}</small></header>
+                      <ul>
+                        {list.map(x => (
+                          <li key={x.id}>
+                            <Link href={`/deals?deal=${x.id}`} className="hx-deal">
+                              <img src={img(dealImage[x.kind])} alt="" loading="lazy" />
+                              <span><b>{x.title}</b><small>{x.ticket}</small></span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>
@@ -293,5 +296,97 @@ export function Home() {
       <Footer />
       <StickyCta />
     </>
+  );
+}
+
+// Rounds slide past on their own (paused on hover, touch or focus, and off for reduced
+// motion); tapping a round opens its deals underneath.
+function RoundScroller() {
+  const { t } = useLang();
+  const track = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState<number | null>(1);
+  const [active, setActive] = useState(0);
+  const paused = useRef(false);
+
+  const go = (i: number) => {
+    const el = track.current;
+    const card = el?.children[i] as HTMLElement | undefined;
+    if (!el || !card) return;
+    el.scrollTo({ left: card.offsetLeft - el.offsetLeft, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const el = track.current;
+    if (!el) return;
+    const onScroll = () => {
+      const w = (el.children[0] as HTMLElement | undefined)?.offsetWidth ?? 1;
+      setActive(Math.min(rounds.length - 1, Math.round(el.scrollLeft / (w + 16))));
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return () => el.removeEventListener('scroll', onScroll);
+    const timer = window.setInterval(() => {
+      if (paused.current || document.hidden) return;
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 8;
+      if (atEnd) el.scrollTo({ left: 0, behavior: 'smooth' });
+      else el.scrollBy({ left: (el.children[0] as HTMLElement).offsetWidth + 16, behavior: 'smooth' });
+    }, 3800);
+    return () => { window.clearInterval(timer); el.removeEventListener('scroll', onScroll); };
+  }, []);
+
+  const pause = () => { paused.current = true; };
+  const openRound = open ? rounds.find(r => r.n === open)! : null;
+  const openDeals = open ? deals.filter(x => x.round === open) : [];
+
+  return (
+    <div className="hx-scroller" onMouseEnter={pause} onMouseLeave={() => { paused.current = false; }} onTouchStart={pause} onFocus={pause}>
+      <div className="hx-scroll-nav">
+        <button type="button" aria-label="Previous round" onClick={() => { pause(); go(Math.max(0, active - 1)); }}><ArrowLeft size={18} /></button>
+        <div className="hx-dots" aria-hidden="true">{rounds.map((r, i) => <span key={r.n} className={i === active ? 'on' : ''} />)}</div>
+        <button type="button" aria-label="Next round" onClick={() => { pause(); go(Math.min(rounds.length - 1, active + 1)); }}><ArrowRight size={18} /></button>
+      </div>
+      <div className="hx-track" ref={track}>
+        {rounds.map(r => {
+          const list = deals.filter(x => x.round === r.n);
+          const lead = list.find(x => x.tier === 'big') ?? list[0];
+          const isOpen = open === r.n;
+          return (
+            <button key={r.n} type="button" className={`hx-rcard ${isOpen ? 'open' : ''}`} aria-expanded={isOpen} aria-controls="hx-round-panel"
+              onClick={() => { pause(); setOpen(isOpen ? null : r.n); }}>
+              <img src={img(dealImage[lead.kind])} alt="" loading="lazy" />
+              <span className="hx-rcard-shade" />
+              <span className="hx-rcard-top"><b>{t.hx_round.replace('{n}', String(r.n))}</b><small>{t.hx_count.replace('{n}', String(list.length))}</small></span>
+              <span className="hx-rcard-body">
+                <strong>{r.install}</strong>
+                <small>{t.hx_optin.replace('{a}', dateLabel(r.optInFrom)).replace('{b}', dateLabel(r.optInTo))}</small>
+                <span className="hx-rcard-thumbs">{list.slice(0, 4).map(x => <img key={x.id} src={img(dealImage[x.kind])} alt="" loading="lazy" />)}</span>
+                <span className="hx-rcard-cta">{isOpen ? t.hx_close : t.hx_open} <ArrowRight size={16} /></span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <div id="hx-round-panel" className={`hx-panel ${openRound ? 'open' : ''}`} aria-live="polite">
+        <div>
+          {openRound && (
+            <div className="hx-panel-inner" key={openRound.n}>
+              <div className="hx-panel-head">
+                <p className="overline">{t.hx_round.replace('{n}', String(openRound.n))} · {openRound.install}</p>
+                <Link href="/deals" className="hx-pill">{t.ahead_cta} <ArrowRight size={16} /></Link>
+              </div>
+              <ul className="hx-panel-grid">
+                {openDeals.map((x, i) => (
+                  <li key={x.id} style={{ '--i': i } as React.CSSProperties}>
+                    <Link href={`/deals?deal=${x.id}`} className="hx-dcard">
+                      <img src={img(dealImage[x.kind])} alt="" loading="lazy" />
+                      <span><b>{x.title}</b><small>{x.ticket}</small><em>{x.why}</em></span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
