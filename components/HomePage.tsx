@@ -1,6 +1,10 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
-import { Sun, ShieldCheck, BadgeCheck, Check, MessageCircle, ChevronDown, Clock, ArrowRight, House, Building2, HeartHandshake } from 'lucide-react';
+import {
+  ArrowRight, BadgeCheck, Calendar, Check, ChevronDown, ClipboardList, IndianRupee, MessageCircle, Percent,
+  PlayCircle, ShieldCheck, Sun, Users, Wrench, BadgePercent,
+} from 'lucide-react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { StickyCta } from './StickyCta';
@@ -10,200 +14,278 @@ import { useLang } from './LangProvider';
 import { useStats } from './useStats';
 import { CountUp, useReveal } from './Motion';
 import { currentRound, inr, site, waLink } from '@/lib/config';
-import { deals, roundOf, solarCities } from '@/lib/deals';
+import { deals, rounds, solarCities, type DealKind } from '@/lib/deals';
 
-const BACK_POSE = { rx: 9, ry: -16, gx: 70, gy: 30 };
+// Photo for each kind of deal, from public/images.
+const dealImage: Record<DealKind, string> = {
+  solar: 'rooftop-solar', painting: 'interior-painting', waterproofing: 'waterproofing', cooling: 'air-conditioners',
+  backup: 'inverters-batteries', pest: 'pest-control', water: 'water-purifiers', heater: 'water-heaters',
+  security: 'cctv-security', kitchen: 'modular-kitchen', fans: 'bldc-fans-lights', appliances: 'kitchen-appliances',
+  coolroof: 'cool-roof', rainwater: 'rainwater-harvesting', windows: 'upvc-windows', bathroom: 'bathroom-improvements',
+  furniture: 'mattresses-sofas', decor: 'blinds-curtains', whitegoods: 'home-appliances',
+};
+const img = (name: string) => `/images/${name}.jpg`;
+const d = (n: number) => ({ '--d': n }) as React.CSSProperties;
 
 export function Home() {
   const { t } = useLang();
   const stats = useStats();
   useReveal();
+  const [roundTab, setRoundTab] = useState(0);
   const optins = stats?.optins ?? 0;
   const pct = Math.min(100, Math.round((optins / currentRound.target) * 100));
   const seatsTaken = Math.min(site.foundingSeats, stats?.members ?? 0);
   const seatsPct = Math.round((seatsTaken / site.foundingSeats) * 100);
   const seatsLabel = t.plan_seats.replace('{n}', (site.foundingSeats - seatsTaken).toLocaleString('en-IN'));
   const closes = new Date(currentRound.closes).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  const shownRounds = roundTab ? rounds.filter(r => r.n === roundTab) : rounds;
+  const solarDeal = deals.find(x => x.kind === 'solar')!;
 
   return (
     <>
       <Header />
-      <main id="main">
-        <section className="hero">
-          <div className="wrap">
-            <div className="hero-grid">
-              <div>
-                <p className="overline" data-reveal>{t.hero_over}</p>
-                <h1 data-reveal style={{ '--d': 1 } as React.CSSProperties}>{t.hero_title}</h1>
-                <p className="hero-line" data-reveal style={{ '--d': 2 } as React.CSSProperties}>{t.h_line}</p>
-                <div className="hero-ctas" data-reveal style={{ '--d': 3 } as React.CSSProperties}>
-                  <Link href="/join" className="gm-btn gm-btn-primary">{t.hero_cta} <ArrowRight size={18} /></Link>
-                  <Link href="/deals" className="gm-btn gm-btn-secondary">{t.h_deals}</Link>
-                </div>
-                <p className="hero-note" data-reveal style={{ '--d': 4 } as React.CSSProperties}><BadgeCheck size={18} /> {t.hero_note}</p>
-              </div>
-              <div className="card-stage" aria-hidden="true">
-                <MalakCard className="back" finish="titanium" still pose={BACK_POSE} name="Rahul Joshi" number="GM · 0002 · NGP" label={t.card_member} over={t.card_over} />
-                <MalakCard className="front" name="Priya Deshmukh" number="GM · 0001 · NGP" label={t.card_member} over={t.card_over} />
-                <div className="gm-alert float">
-                  <div className="gm-alert-badge"><MessageCircle size={18} /></div>
-                  <div className="gm-alert-body">
-                    <p className="gm-alert-from">Gharmalak <span>{t.example}</span></p>
-                    <p className="gm-alert-text">Round 1: rooftop solar, installed in January. Opt in from 1 Nov.{'\n'}Reply YES.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="section statement">
-          <div className="wrap">
-            <p className="overline" data-reveal>{t.st_over}</p>
-            <h2 className="statement-title" data-reveal style={{ '--d': 1 } as React.CSSProperties}>{t.st_title}</h2>
-            <p className="statement-body" data-reveal style={{ '--d': 2 } as React.CSSProperties}>{t.st_body}</p>
-            <div className="counters" role="list">
-              <div className="counter" role="listitem" data-reveal><span className="counter-num amount">{stats ? <CountUp to={stats.members} /> : '·'}</span><span>{t.stat_members}</span></div>
-              <div className="counter" role="listitem" data-reveal style={{ '--d': 1 } as React.CSSProperties}><span className="counter-num amount">{stats ? <CountUp to={stats.optins} /> : '·'}</span><span>{t.stat_optins}</span></div>
-              <div className="counter" role="listitem" data-reveal style={{ '--d': 2 } as React.CSSProperties}><span className="counter-num amount"><CountUp to={10} suffix="%" /></span><span>{t.stat_saving}</span></div>
-              <div className="counter" role="listitem" data-reveal style={{ '--d': 3 } as React.CSSProperties}><span className="counter-num amount"><CountUp to={solarCities.length} /></span><span>{t.stat_cities}</span></div>
-            </div>
-          </div>
-        </section>
-
-        <section className="section" id="how">
-          <div className="wrap">
-            <div className="section-head">
-              <p className="overline" data-reveal>{t.how_over}</p>
-              <h2 data-reveal style={{ '--d': 1 } as React.CSSProperties}>{t.how_title}</h2>
-            </div>
-            <div className="how-grid">
-              {[1, 2, 3, 4].map(n => (
-                <article key={n} className={`how-card ${n === 4 ? 'warn' : ''}`} data-reveal style={{ '--d': n } as React.CSSProperties}>
-                  <span className="how-num">0{n}</span>
-                  <h3>{t[`step${n}_t` as 'step1_t']}</h3>
-                  <p>{t[`step${n}_b` as 'step1_b']}</p>
-                </article>
-              ))}
-            </div>
-            <HowVideo />
-          </div>
-        </section>
-
-        <section className="section">
-          <div className="wrap round-grid">
+      <main id="main" className="hx">
+        {/* Hero: photo behind, Malak Card and a WhatsApp message on the right */}
+        <section className="hx-hero">
+          <img className="hx-hero-photo" src={img('hero-bungalow')} alt="" fetchPriority="high" />
+          <div className="wrap hx-hero-grid">
             <div>
-              <p className="overline" data-reveal>{t.round_over}</p>
-              <div className="section-head" style={{ marginBottom: 0 }}>
-                <h2 data-reveal style={{ '--d': 1 } as React.CSSProperties}>{t.round_title}</h2>
-                <p data-reveal style={{ '--d': 2 } as React.CSSProperties}>{t.r1_line}</p>
+              <p className="overline" data-reveal>{t.hero_over}</p>
+              <h1 data-reveal style={d(1)}>{t.hero_title}</h1>
+              <p className="hx-hero-line" data-reveal style={d(2)}>{t.h_line}</p>
+              <p className="hx-hero-body" data-reveal style={d(2)}>{t.hero_body}</p>
+              <div className="hero-ctas" data-reveal style={d(3)}>
+                <Link href="/join" className="gm-btn gm-btn-primary">{t.hero_cta} <ArrowRight size={18} /></Link>
+                <Link href="/deals" className="gm-btn gm-btn-secondary hx-btn-glass">{t.h_deals}</Link>
               </div>
-              <div className="hero-ctas" data-reveal style={{ '--d': 3 } as React.CSSProperties}>
-                <Link href="/round/solar-nagpur" className="gm-btn gm-btn-secondary">{t.round_cta} <ArrowRight size={18} /></Link>
+              <p className="hero-note" data-reveal style={d(4)}><BadgeCheck size={18} /> {t.hero_note}</p>
+            </div>
+            <div className="hx-hero-side" aria-hidden="true">
+              <MalakCard name="Priya Deshmukh" number="GM · 0001 · NGP" label={t.card_member} over={t.card_over} />
+              <div className="gm-alert hx-alert">
+                <div className="gm-alert-badge"><MessageCircle size={18} /></div>
+                <div className="gm-alert-body">
+                  <p className="gm-alert-from">Gharmalak <span>· {t.example}</span></p>
+                  <p className="gm-alert-text">Round 1: rooftop solar, installed in January. Opt in from 1 Nov. Reply <b>YES</b>.</p>
+                </div>
               </div>
             </div>
-            <article className="gm-deal" data-reveal style={{ '--d': 2 } as React.CSSProperties}>
-              <div className="gm-deal-head">
-                <h3 className="gm-deal-title"><Sun className="gm-icon" /> {t.i_solar}</h3>
-                <span className="gm-badge gm-badge-pending"><Clock className="gm-icon" /> {t.r_status_soon}</span>
+          </div>
+        </section>
+
+        {/* Why: the statement, with the numbers in a card */}
+        <section className="hx-section hx-tint">
+          <div className="wrap hx-why">
+            <div>
+              <p className="overline" data-reveal>{t.st_over}</p>
+              <h2 className="hx-h2" data-reveal style={d(1)}>{t.st_title}</h2>
+              <p className="hx-lead" data-reveal style={d(2)}>{t.st_body}</p>
+            </div>
+            <div className="hx-stat-card" data-reveal style={d(2)}>
+              <div className="hx-stat-top">
+                <span className="hx-icon-tile"><BadgePercent /></span>
+                <div><span className="hx-stat-big amount"><CountUp to={10} suffix="%" /></span><span className="hx-stat-cap">{t.stat_saving}</span></div>
               </div>
-              <div className="round-facts">
-                <div className="fact"><small>{t.round_pbt}</small><strong>{t.round_pbt_val}</strong></div>
-                <div className="fact"><small>{t.round_saving}</small><strong>{t.round_saving_val}</strong></div>
+              <div className="hx-stat-row" role="list">
+                <div role="listitem"><span className="amount">{stats ? <CountUp to={stats.members} /> : '·'}</span><small>{t.stat_members}</small></div>
+                <div role="listitem"><span className="amount">{stats ? <CountUp to={stats.optins} /> : '·'}</span><small>{t.stat_optins}</small></div>
+                <div role="listitem"><span className="amount"><CountUp to={solarCities.length} /></span><small>{t.stat_cities}</small></div>
               </div>
-              <div className="meter">
-                <div className="gm-progress" role="progressbar" aria-valuenow={optins} aria-valuemin={0} aria-valuemax={currentRound.target} aria-label={t.round_homes}><span style={{ width: `${Math.max(pct, 2)}%` }} /></div>
-                <div className="meter-row"><span><strong className="amount" style={{ color: 'var(--ink)' }}>{optins}</strong> / {currentRound.target} {t.round_homes}</span><span>{t.round_closes} {closes}</span></div>
+            </div>
+          </div>
+        </section>
+
+        {/* How a round works: four steps with arrows, then the explainer */}
+        <section className="hx-section" id="how">
+          <div className="wrap">
+            <div className="hx-head-row">
+              <div>
+                <p className="overline" data-reveal>{t.how_over}</p>
+                <h2 className="hx-h2" data-reveal style={d(1)}>{t.how_title}</h2>
+              </div>
+              <a href="#how-video" className="hx-pill" data-reveal style={d(2)}><PlayCircle size={18} /> {t.vid_label} <span>· {t.vid_note}</span></a>
+            </div>
+            <ol className="hx-steps">
+              {([ClipboardList, MessageCircle, Users, ShieldCheck] as const).map((Icon, i) => (
+                <li key={i} className={`hx-step ${i === 3 ? 'warn' : ''}`} data-reveal style={d(i + 1)}>
+                  <div className="hx-step-top"><span className="hx-icon-tile"><Icon /></span><span className="hx-num">0{i + 1}</span></div>
+                  <h3>{t[`step${i + 1}_t` as 'step1_t']}</h3>
+                  <p>{t[`step${i + 1}_b` as 'step1_b']}</p>
+                  {i < 3 && <span className="hx-step-arrow" aria-hidden="true"><ArrowRight size={14} /></span>}
+                </li>
+              ))}
+            </ol>
+            <div id="how-video"><HowVideo /></div>
+          </div>
+        </section>
+
+        {/* Round 1: photo and the live round card */}
+        <section className="hx-section hx-tint">
+          <div className="wrap">
+            <article className="hx-round" data-reveal>
+              <div className="hx-round-photo">
+                <img src={img('rooftop-solar')} alt="Rooftop solar panels on a house" loading="lazy" />
+                <p className="hx-chip"><Sun size={16} /> {t.hx_chip} · {t.hx_cities.replace('{n}', String(solarCities.length))} <b>{t.hx_subsidy}</b></p>
+              </div>
+              <div className="hx-round-body">
+                <p className="overline">{t.round_over} · {t.r_status_soon}</p>
+                <h2 className="hx-h2">{t.round_title}</h2>
+                <p className="hx-round-line">{t.r1_line}</p>
+                <p className="hx-muted">{t.round_body}</p>
+                <dl className="hx-facts">
+                  <div><Calendar /><dt>{t.hx_optwin}</dt><dd>{t.hx_optwin_val}</dd></div>
+                  <div><IndianRupee /><dt>{t.round_pbt}</dt><dd>{t.round_pbt_val}</dd></div>
+                  <div><Percent /><dt>{t.round_saving}</dt><dd>{t.round_saving_val}</dd></div>
+                  <div><Users /><dt>{t.hx_group}</dt><dd><span className="amount">{optins}</span> / {currentRound.target} {t.round_homes}</dd></div>
+                </dl>
+                <div className="meter">
+                  <div className="gm-progress" role="progressbar" aria-valuenow={optins} aria-valuemin={0} aria-valuemax={currentRound.target} aria-label={t.round_homes}><span style={{ width: `${Math.max(pct, 2)}%` }} /></div>
+                  <div className="meter-row"><span><strong className="amount">{optins}</strong> / {currentRound.target} {t.round_homes}</span><span>{t.round_closes} {closes}</span></div>
+                </div>
+                <div className="hx-round-cta">
+                  <Link href="/round/solar-nagpur" className="gm-btn gm-btn-primary">{t.round_cta} <ArrowRight size={18} /></Link>
+                  <small>{t.hx_spend}: {solarDeal.ticket}</small>
+                </div>
               </div>
             </article>
           </div>
         </section>
 
-        <section className="section ahead">
-          <div className="wrap ahead-head">
-            <div>
-              <p className="overline" data-reveal>{t.ahead_over}</p>
-              <h2 data-reveal style={{ '--d': 1 } as React.CSSProperties}>{t.ahead_title}</h2>
+        {/* The year ahead: every round as a column of deals, with tabs */}
+        <section className="hx-section">
+          <div className="wrap">
+            <div className="hx-head-row">
+              <div>
+                <p className="overline" data-reveal>{t.ahead_over}</p>
+                <h2 className="hx-h2" data-reveal style={d(1)}>{t.ahead_title}</h2>
+              </div>
+              <Link href="/deals" className="hx-pill" data-reveal style={d(2)}>{t.ahead_cta} <ArrowRight size={16} /></Link>
             </div>
-            <Link href="/deals" className="deal-link" data-reveal style={{ '--d': 2 } as React.CSSProperties}>{t.ahead_cta} <ArrowRight size={16} /></Link>
-          </div>
-          <div className="marquee" aria-label={t.ahead_title}>
-            <ul className="marquee-track">
-              {[...deals, ...deals].map((d, i) => (
-                <li key={d.id + i} className="marquee-item" aria-hidden={i >= deals.length}>
-                  <span className="marquee-when">{roundOf(d).install}</span>
-                  <span>{d.title}</span>
-                </li>
+            <div className="hx-tabs" role="tablist" aria-label={t.ahead_title}>
+              <button role="tab" aria-selected={roundTab === 0} onClick={() => setRoundTab(0)}>{t.hx_all.replace('{n}', String(deals.length))}</button>
+              {rounds.map(r => (
+                <button key={r.n} role="tab" aria-selected={roundTab === r.n} onClick={() => setRoundTab(r.n)}>{t.hx_round.replace('{n}', String(r.n))}</button>
               ))}
-            </ul>
+            </div>
+            <div className="hx-rounds">
+              {shownRounds.map(r => {
+                const list = deals.filter(x => x.round === r.n);
+                return (
+                  <section key={r.n} className="hx-col" aria-label={`${t.hx_round.replace('{n}', String(r.n))}, ${r.install}`}>
+                    <header><span>{t.hx_round.replace('{n}', String(r.n))} · {r.install}</span><small>{t.hx_count.replace('{n}', String(list.length))}</small></header>
+                    <ul>
+                      {list.map(x => (
+                        <li key={x.id}>
+                          <Link href={`/deals?deal=${x.id}`} className="hx-deal">
+                            <img src={img(dealImage[x.kind])} alt="" loading="lazy" />
+                            <span><b>{x.title}</b><small>{x.ticket}</small></span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        <section className="section">
+        {/* Who it's for: three photo cards */}
+        <section className="hx-section hx-tint">
           <div className="wrap">
             <div className="section-head">
               <p className="overline" data-reveal>{t.who_over}</p>
-              <h2 data-reveal style={{ '--d': 1 } as React.CSSProperties}>{t.who_title}</h2>
+              <h2 className="hx-h2" data-reveal style={d(1)}>{t.who_title}</h2>
             </div>
-            <div className="who-grid">
-              {([[House, 1], [Building2, 2], [HeartHandshake, 3]] as const).map(([Icon, n]) => (
-                <article key={n} className="who-card" data-reveal style={{ '--d': n } as React.CSSProperties}>
-                  <div className="why-icon"><Icon /></div>
-                  <h3>{t[`who${n}_t` as 'who1_t']}</h3>
-                  <p>{t[`who${n}_b` as 'who1_b']}</p>
+            <div className="hx-who">
+              {(['independent-house', 'apartment-building', 'homeowners'] as const).map((photo, i) => (
+                <article key={photo} className="hx-who-card" data-reveal style={d(i + 1)}>
+                  <img src={img(photo)} alt="" loading="lazy" />
+                  <div>
+                    <h3>{t[`who${i + 1}_t` as 'who1_t']}</h3>
+                    <p className="hx-who-line">{t[`who${i + 1}_b` as 'who1_b']}</p>
+                    <p className="hx-muted">{t[`hx_who${i + 1}_d` as 'hx_who1_d']}</p>
+                  </div>
                 </article>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="section promise">
+        {/* Our promise: full-width band */}
+        <section className="hx-promise">
           <div className="wrap">
             <p className="overline" data-reveal>{t.not_over}</p>
-            <h2 className="statement-title" data-reveal style={{ '--d': 1 } as React.CSSProperties}>{t.not_title}</h2>
-            <ul className="promise-ticks" data-reveal style={{ '--d': 2 } as React.CSSProperties}>
-              {[t.why1_t, t.why2_t, t.why3_t].map(x => <li key={x}><ShieldCheck size={18} /> {x}</li>)}
-            </ul>
-          </div>
-        </section>
-
-        <section className="section" id="join">
-          <div className="wrap plan-wrap">
-            <div className="gm-plan" data-reveal>
-              <div className="plan-head"><p className="overline">{t.plan_title}</p><span className="plan-badge">{t.plan_badge}</span></div>
-              <div className="gm-plan-price"><s className="plan-was">{inr(site.regularFee)}</s><span className="gm-amount amount">{inr(site.fee)}</span><span className="gm-plan-per">{t.plan_per}</span></div>
-              <p className="plan-save"><BadgeCheck size={18} /> {t.plan_save}</p>
-              <ul className="gm-ticks">
-                {[t.plan_t1, t.plan_t2, t.plan_t3, t.plan_t4].map(x => <li key={x}><Check className="gm-icon" size={20} /> {x}</li>)}
-              </ul>
-              <div className="meter">
-                <div className="gm-progress" role="progressbar" aria-valuenow={seatsTaken} aria-valuemin={0} aria-valuemax={site.foundingSeats} aria-label={seatsLabel}><span style={{ width: `${Math.max(seatsPct, 2)}%` }} /></div>
-                <div className="meter-row"><span>{seatsLabel}</span></div>
-              </div>
-              <Link href="/join" className="gm-btn gm-btn-primary gm-btn-block">{t.hero_cta}</Link>
-              <p className="plan-note">{t.plan_note}</p>
-            </div>
-            <div data-reveal style={{ '--d': 1 } as React.CSSProperties}>
-              <h2 style={{ fontSize: 28, marginBottom: 16 }}>{t.faq_title}</h2>
-              <div className="faq">
-                {[5, 1, 2, 3, 4].map(n => (
-                  <details key={n}>
-                    <summary>{t[`faq${n}_q` as 'faq1_q']} <ChevronDown size={20} /></summary>
-                    <p>{t[`faq${n}_a` as 'faq1_a']}</p>
-                  </details>
-                ))}
-              </div>
+            <h2 data-reveal style={d(1)}>{t.not_title}</h2>
+            <div className="hx-promise-grid">
+              {([[ShieldCheck, 1], [IndianRupee, 2], [Wrench, 3]] as const).map(([Icon, n]) => (
+                <div key={n} data-reveal style={d(n)}>
+                  <span className="hx-icon-tile"><Icon /></span>
+                  <h3>{t[`why${n}_t` as 'why1_t']}</h3>
+                  <p>{t[`why${n}_b` as 'why1_b']}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="cta-band">
+        {/* Join: card and seats on the left, price on the right */}
+        <section className="hx-section" id="join">
           <div className="wrap">
-            <p className="overline" data-reveal>{t.end_over}</p>
-            <h2 data-reveal style={{ '--d': 1 } as React.CSSProperties}>{t.end_title}</h2>
-            <div className="hero-ctas" data-reveal style={{ '--d': 2 } as React.CSSProperties}>
-              <Link href="/join" className="gm-btn gm-btn-primary">{t.hero_cta}</Link>
-              <a className="gm-btn gm-btn-secondary" href={waLink('Hi Gharmalak, I want to know more about the club.')} target="_blank" rel="noopener"><MessageCircle size={18} /> {t.hero_wa}</a>
+            <p className="overline" data-reveal>{t.join_over}</p>
+            <h2 className="hx-h2" data-reveal style={d(1)}>{t.plan_title}</h2>
+            <div className="hx-join">
+              <div className="hx-join-side" data-reveal>
+                <div className="hx-join-card" aria-hidden="true">
+                  <MalakCard finish="titanium" name="Rahul Joshi" number="GM · 0002 · NGP" label={t.card_member} over={t.card_over} />
+                </div>
+                <div className="hx-seats">
+                  <div className="meter-row" style={{ marginTop: 0 }}><strong>{seatsLabel}</strong></div>
+                  <div className="gm-progress" role="progressbar" aria-valuenow={seatsTaken} aria-valuemin={0} aria-valuemax={site.foundingSeats} aria-label={seatsLabel}><span style={{ width: `${Math.max(seatsPct, 2)}%` }} /></div>
+                  <p className="hx-muted">{t.pay_credit}</p>
+                </div>
+              </div>
+              <div className="hx-price" data-reveal style={d(1)}>
+                <div className="plan-head"><p className="overline">{t.plan_badge}</p><p className="plan-save"><BadgeCheck size={18} /> {t.plan_save}</p></div>
+                <div className="gm-plan-price"><s className="plan-was">{inr(site.regularFee)}</s><span className="gm-amount amount">{inr(site.fee)}</span><span className="gm-plan-per">{t.plan_per}</span></div>
+                <ul className="gm-ticks">
+                  {[t.plan_t1, t.plan_t2, t.plan_t3, t.plan_t4].map(x => <li key={x}><Check className="gm-icon" size={20} /> {x}</li>)}
+                </ul>
+                <Link href="/join" className="gm-btn gm-btn-primary gm-btn-block">{t.hero_cta} <ArrowRight size={18} /></Link>
+                <p className="plan-note">{t.plan_note}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Questions: two columns */}
+        <section className="hx-section hx-tint">
+          <div className="wrap">
+            <h2 className="hx-h2" style={{ marginBottom: 'var(--space-8)' }}>{t.faq_title}</h2>
+            <div className="hx-faq">
+              {[5, 1, 2, 3, 4].map((n, i) => (
+                <details key={n} open={i === 0}>
+                  <summary>{t[`faq${n}_q` as 'faq1_q']} <ChevronDown size={20} /></summary>
+                  <p>{t[`faq${n}_a` as 'faq1_a']}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Closing card */}
+        <section className="hx-section">
+          <div className="wrap">
+            <div className="hx-end" data-reveal>
+              <img src={img('final-cta-home')} alt="" loading="lazy" />
+              <div>
+                <p className="overline">{t.end_over}</p>
+                <h2>{t.end_title}</h2>
+                <div className="hero-ctas">
+                  <Link href="/join" className="gm-btn gm-btn-primary">{t.hero_cta} <ArrowRight size={18} /></Link>
+                  <a className="gm-btn gm-btn-secondary" href={waLink('Hi Gharmalak, I want to know more about the club.')} target="_blank" rel="noopener"><MessageCircle size={18} /> {t.hero_wa}</a>
+                </div>
+              </div>
             </div>
           </div>
         </section>

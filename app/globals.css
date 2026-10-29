@@ -1,5 +1,6 @@
 @import './styles/tokens.css';
 @import './styles/gm-components.css';
+@import './styles/home-v2.css';
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }

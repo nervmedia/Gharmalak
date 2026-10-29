@@ -152,6 +152,19 @@ const en = {
   r_opt_already: 'You had already opted in. We will message you on WhatsApp.',
   r_opt_notmember: 'This number is not a member yet. Join first, it takes two minutes.',
   example: 'Example',
+  hx_optwin: 'Opt-in window',
+  hx_optwin_val: '1 Nov – 31 Dec',
+  hx_group: 'Minimum group',
+  hx_spend: 'Typical spend',
+  hx_chip: '3 kW on-grid rooftop solar',
+  hx_subsidy: 'PM Surya Ghar subsidy',
+  hx_cities: '{n} cities',
+  hx_all: 'All {n} deals',
+  hx_round: 'Round {n}',
+  hx_count: '{n} deals',
+  hx_who1_d: '3 kW rooftop solar with the PM Surya Ghar paperwork, terrace waterproofing before the rains, and painting inside and out.',
+  hx_who2_d: 'Air conditioners with installation, water purifiers, modular kitchens and wardrobes, and energy-saving fans.',
+  hx_who3_d: "Join on your family's behalf and get work done on your parents' home from another city, with vendors we verify.",
 };
 
 export type Dict = typeof en;
@@ -299,6 +312,19 @@ const mr: Dict = {
   r_opt_already: 'तुमचा होकार आधीच नोंदला आहे. WhatsApp वर कळवू.',
   r_opt_notmember: 'हा क्रमांक अजून सदस्य नाही. आधी सामील व्हा, दोन मिनिटे लागतात.',
   example: 'उदाहरण',
+  hx_optwin: 'नोंदणीची मुदत',
+  hx_optwin_val: '1 नोव्हें – 31 डिसें',
+  hx_group: 'किमान गट',
+  hx_spend: 'साधारण खर्च',
+  hx_chip: '3 kW ऑन-ग्रिड छतावरील सोलर',
+  hx_subsidy: 'पीएम सूर्य घर अनुदान',
+  hx_cities: '{n} शहरे',
+  hx_all: 'सर्व {n} डील',
+  hx_round: 'फेरी {n}',
+  hx_count: '{n} डील',
+  hx_who1_d: '3 kW छतावरील सोलर आणि पीएम सूर्य घरची कागदपत्रे, पावसाआधी गच्चीचे वॉटरप्रूफिंग, आणि आतून-बाहेरून रंगकाम.',
+  hx_who2_d: 'बसवणीसह एसी, वॉटर प्युरिफायर, मॉड्युलर किचन आणि वॉर्डरोब, आणि वीज वाचवणारे पंखे.',
+  hx_who3_d: 'कुटुंबाच्या वतीने सामील व्हा आणि दुसऱ्या शहरातून आई-वडिलांच्या घराची कामे करून घ्या, आम्ही तपासलेल्या व्हेंडरकडून.',
 };
 
 const hi: Dict = {
@@ -444,6 +470,19 @@ const hi: Dict = {
   r_opt_already: 'आपकी हाँ पहले से दर्ज है। WhatsApp पर बताएँगे।',
   r_opt_notmember: 'यह नंबर अभी सदस्य नहीं है। पहले जुड़ें, दो मिनट लगते हैं।',
   example: 'उदाहरण',
+  hx_optwin: 'ऑप्ट-इन की अवधि',
+  hx_optwin_val: '1 नवं – 31 दिसं',
+  hx_group: 'न्यूनतम समूह',
+  hx_spend: 'आम खर्च',
+  hx_chip: '3 kW ऑन-ग्रिड छत सोलर',
+  hx_subsidy: 'पीएम सूर्य घर सब्सिडी',
+  hx_cities: '{n} शहर',
+  hx_all: 'सभी {n} डील',
+  hx_round: 'राउंड {n}',
+  hx_count: '{n} डील',
+  hx_who1_d: '3 kW छत सोलर और पीएम सूर्य घर के कागज़, बारिश से पहले छत की वॉटरप्रूफिंग, और अंदर-बाहर पेंटिंग।',
+  hx_who2_d: 'इंस्टॉलेशन के साथ एसी, वॉटर प्यूरीफायर, मॉड्यूलर किचन और वॉर्डरोब, और बिजली बचाने वाले पंखे।',
+  hx_who3_d: 'परिवार की ओर से जुड़ें और दूसरे शहर से माता-पिता के घर का काम करवाएँ, हमारे जाँचे हुए वेंडर से।',
 };
 
 export const dict: Record<Lang, Dict> = { en, mr, hi };
