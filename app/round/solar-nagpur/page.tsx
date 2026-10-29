@@ -3,7 +3,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { RoundView } from './RoundView';
 
-export const metadata: Metadata = { title: 'Round 1: rooftop solar, installed in January', description: 'Group deal on 3 kW rooftop solar for homes across Vidarbha, Nashik, Pune and other MSEDCL cities in Maharashtra, and in Ahmedabad and Gandhinagar. Opt in from 1 November; installation in January and February. Ten local quotes set the price to beat; the winning bid must be at least 10% lower.' };
+export const metadata: Metadata = { title: 'Round 1: rooftop solar, installed in January', description: 'Group deal on 3 kW rooftop solar for homes in every Maharashtra district city on MSEDCL, from Vidarbha to Pune and Kolhapur, and in 7 Gujarat cities including Ahmedabad, Gandhinagar and Vadodara. Opt in from 1 November; installation in January and February. Ten local quotes set the price to beat; the winning bid must be at least 10% lower.' };
 
 export default function RoundPage() {
   return (

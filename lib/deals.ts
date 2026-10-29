@@ -36,16 +36,30 @@ export type Deal = {
   roundHref?: string; // live round page, when there is one
 };
 
-// Launch cities: all of Vidarbha plus other Maharashtra cities on MSEDCL, so one
-// empanelled solar installer can cover them with the same subsidy and
-// net-metering process.
+// Launch cities: every Maharashtra district city on MSEDCL (all but Mumbai city
+// and suburbs), so one empanelled solar installer can cover them with the same
+// subsidy and net-metering process.
 export const vidarbhaCities = ['Nagpur', 'Wardha', 'Amravati', 'Chandrapur', 'Akola', 'Yavatmal', 'Washim', 'Buldhana', 'Bhandara', 'Gondia', 'Gadchiroli'];
-export const launchCities = [...vidarbhaCities, 'Chh. Sambhajinagar', 'Nashik', 'Pune'];
+export const restOfMaharashtraCities = [
+  'Pune', 'Nashik', 'Chh. Sambhajinagar', 'Thane', 'Palghar', 'Alibag', 'Ratnagiri', 'Sindhudurg', 'Kolhapur', 'Sangli',
+  'Satara', 'Solapur', 'Ahilyanagar', 'Dhule', 'Nandurbar', 'Jalgaon', 'Jalna', 'Parbhani', 'Hingoli', 'Nanded', 'Latur',
+  'Dharashiv', 'Beed',
+];
+export const launchCities = [...vidarbhaCities, ...restOfMaharashtraCities];
 // Solar only, through a separate Gujarat installer; other deals come later there.
-export const solarOnlyCities = ['Ahmedabad', 'Gandhinagar'];
+export const solarOnlyCities = ['Ahmedabad', 'Gandhinagar', 'Mehsana', 'Himmatnagar', 'Anand', 'Nadiad', 'Vadodara'];
 export const solarCities = [...launchCities, ...solarOnlyCities];
-export const laterCities = ['Mumbai', 'Surat', 'Vadodara', 'Indore', 'Bhopal', 'Raipur', 'Jaipur', 'Lucknow'];
+export const laterCities = ['Mumbai', 'Surat', 'Indore', 'Bhopal', 'Raipur', 'Jaipur', 'Lucknow'];
 export const dealCities = [...launchCities, ...solarOnlyCities, ...laterCities, 'Other'];
+
+// For the city pickers: a few big cities as quick chips, the rest grouped in a list.
+export const quickCities = ['Nagpur', 'Pune', 'Nashik', 'Chh. Sambhajinagar', 'Ahmedabad', 'Vadodara'];
+export const cityGroups = [
+  { label: 'Vidarbha', cities: vidarbhaCities },
+  { label: 'Rest of Maharashtra', cities: restOfMaharashtraCities },
+  { label: 'Gujarat (solar only)', cities: solarOnlyCities },
+  { label: 'Coming later', cities: laterCities },
+];
 
 // City centres, used on the visitor's own device to find the nearest city.
 // Coordinates never leave the browser.
@@ -54,6 +68,12 @@ export const cityCentres: Record<string, [number, number]> = {
   Akola: [20.7002, 77.0082], Yavatmal: [20.3888, 78.1204], Washim: [20.111, 77.133], Buldhana: [20.5293, 76.1842],
   Bhandara: [21.1667, 79.65], Gondia: [21.4624, 80.192], Gadchiroli: [20.1849, 79.9948], Gandhinagar: [23.2156, 72.6369],
   'Chh. Sambhajinagar': [19.8762, 75.3433], Nashik: [19.9975, 73.7898], Pune: [18.5204, 73.8567],
+  Thane: [19.2183, 72.9781], Palghar: [19.6967, 72.7699], Alibag: [18.6414, 72.8722], Ratnagiri: [16.9902, 73.312],
+  Sindhudurg: [16.08, 73.69], Kolhapur: [16.705, 74.2433], Sangli: [16.8524, 74.5815], Satara: [17.6805, 74.0183],
+  Solapur: [17.6599, 75.9064], Ahilyanagar: [19.0952, 74.7496], Dhule: [20.9042, 74.7749], Nandurbar: [21.37, 74.24],
+  Jalgaon: [21.0077, 75.5626], Jalna: [19.841, 75.8864], Parbhani: [19.2608, 76.7748], Hingoli: [19.7173, 77.1494],
+  Nanded: [19.1383, 77.321], Latur: [18.4088, 76.5604], Dharashiv: [18.186, 76.0419], Beed: [18.9891, 75.7601],
+  Mehsana: [23.588, 72.3693], Himmatnagar: [23.598, 72.966], Anand: [22.5645, 72.9289], Nadiad: [22.6916, 72.8634],
   Mumbai: [19.076, 72.8777], Ahmedabad: [23.0225, 72.5714], Surat: [21.1702, 72.8311], Vadodara: [22.3072, 73.1812],
   Indore: [22.7196, 75.8577], Bhopal: [23.2599, 77.4126], Raipur: [21.2514, 81.6296], Jaipur: [26.9124, 75.7873], Lucknow: [26.8467, 80.9462],
 };
