@@ -5,6 +5,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { StickyCta } from './StickyCta';
 import { MalakCard } from './MalakCard';
+import { HowVideo } from './HowVideo';
 import { useLang } from './LangProvider';
 import { useStats } from './useStats';
 import { CountUp, useReveal } from './Motion';
@@ -85,6 +86,7 @@ export function Home() {
                 </article>
               ))}
             </div>
+            <HowVideo />
           </div>
         </section>
 

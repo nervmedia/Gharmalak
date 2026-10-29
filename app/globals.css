@@ -86,6 +86,13 @@ p { margin: 0; }
 .how-card h3 { font-size: 19px; line-height: 1.3; }
 .how-card p { color: var(--ink-muted); font-size: 16px; }
 .how-card.warn { border-color: var(--brass); background: linear-gradient(180deg, var(--brass-soft), var(--surface-raised)); }
+.how-video { margin: var(--space-10) auto 0; max-width: 960px; }
+.how-video video { display: block; width: 100%; border-radius: var(--radius-lg); border: 1px solid var(--line); background: #111214; }
+.how-video-wide { aspect-ratio: 16 / 9; }
+.how-video-tall { aspect-ratio: 9 / 16; max-width: 360px; margin: 0 auto; display: none !important; }
+@media (max-width: 719px) { .how-video-wide { display: none !important; } .how-video-tall { display: block !important; } }
+.how-video figcaption { margin-top: var(--space-3); color: var(--ink-muted); font-size: 15px; text-align: center; text-wrap: balance; }
+.how-video figcaption svg { vertical-align: -4px; margin-right: 4px; }
 
 .round-grid { display: grid; gap: var(--space-8); align-items: center; }
 @media (min-width: 960px) { .round-grid { grid-template-columns: 1fr 1fr; } }
