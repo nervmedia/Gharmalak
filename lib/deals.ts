@@ -36,16 +36,23 @@ export type Deal = {
   roundHref?: string; // live round page, when there is one
 };
 
-// Launch cities: the Maharashtra cities on MSEDCL, so one empanelled solar
-// installer can cover them all with the same subsidy and net-metering process.
-export const launchCities = ['Nagpur', 'Wardha', 'Amravati', 'Chandrapur', 'Chh. Sambhajinagar', 'Nashik', 'Pune'];
-export const laterCities = ['Mumbai', 'Ahmedabad', 'Surat', 'Vadodara', 'Indore', 'Bhopal', 'Raipur', 'Jaipur', 'Lucknow'];
-export const dealCities = [...launchCities, ...laterCities, 'Other'];
+// Launch cities: all of Vidarbha plus other Maharashtra cities on MSEDCL, so one
+// empanelled solar installer can cover them with the same subsidy and
+// net-metering process.
+export const vidarbhaCities = ['Nagpur', 'Wardha', 'Amravati', 'Chandrapur', 'Akola', 'Yavatmal', 'Washim', 'Buldhana', 'Bhandara', 'Gondia', 'Gadchiroli'];
+export const launchCities = [...vidarbhaCities, 'Chh. Sambhajinagar', 'Nashik', 'Pune'];
+// Solar only, through a separate Gujarat installer; other deals come later there.
+export const solarOnlyCities = ['Ahmedabad', 'Gandhinagar'];
+export const solarCities = [...launchCities, ...solarOnlyCities];
+export const laterCities = ['Mumbai', 'Surat', 'Vadodara', 'Indore', 'Bhopal', 'Raipur', 'Jaipur', 'Lucknow'];
+export const dealCities = [...launchCities, ...solarOnlyCities, ...laterCities, 'Other'];
 
 // City centres, used on the visitor's own device to find the nearest city.
 // Coordinates never leave the browser.
 export const cityCentres: Record<string, [number, number]> = {
   Nagpur: [21.1458, 79.0882], Wardha: [20.7453, 78.6022], Amravati: [20.9374, 77.7796], Chandrapur: [19.9615, 79.2961],
+  Akola: [20.7002, 77.0082], Yavatmal: [20.3888, 78.1204], Washim: [20.111, 77.133], Buldhana: [20.5293, 76.1842],
+  Bhandara: [21.1667, 79.65], Gondia: [21.4624, 80.192], Gadchiroli: [20.1849, 79.9948], Gandhinagar: [23.2156, 72.6369],
   'Chh. Sambhajinagar': [19.8762, 75.3433], Nashik: [19.9975, 73.7898], Pune: [18.5204, 73.8567],
   Mumbai: [19.076, 72.8777], Ahmedabad: [23.0225, 72.5714], Surat: [21.1702, 72.8311], Vadodara: [22.3072, 73.1812],
   Indore: [22.7196, 75.8577], Bhopal: [23.2599, 77.4126], Raipur: [21.2514, 81.6296], Jaipur: [26.9124, 75.7873], Lucknow: [26.8467, 80.9462],
@@ -113,6 +120,7 @@ export function roundOf(d: Deal) {
 
 // Which cities a deal runs in at launch.
 export function dealRunsIn(d: Deal, city: string) {
+  if (d.kind === 'solar') return solarCities.includes(city);
   return d.reach === 'multi' ? launchCities.includes(city) : city === 'Nagpur';
 }
 
